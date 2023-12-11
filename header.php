@@ -42,6 +42,8 @@ if (!defined('CURRENT_URI'))
     </div>
 
     <div class="header-section">
+
+
         <header class="header">
 
             <div class="logo">
@@ -160,65 +162,32 @@ if (!defined('CURRENT_URI'))
                 ); ?>
             </div>
             <div class="swiper-pagination"></div>
-            <div class="container-dem container--main">
-                <div class="header-section__content">
-                    <h1 class="header-section__title">Все виды услуг</h1>
-                    <p class="header-section__subtitle">Мы выполняем полный спектр услуг, будь то простое обслуживание
-                        автомобиля, до сложного ремонта всех узлов.</p>
-                    <div class="header-section__menu">
-                        <div class="header-section__menu-item">
-                            <p class="menu-item__title"> Выберите адрес</p>
-                            <p class="menu-item__info"> ул. Автозаводская, д. 16</p>
-                        </div>
-                        <div class="header-section__menu-item">
-                            <p class="menu-item__title"> Выберите дату</p>
-                            <p class="menu-item__info">Четверг 19</p>
-                        </div>
-                        <div class="header-section__menu-item">
-                            <p class="menu-item__title"> Выберите время</p>
-                            <p class="menu-item__info">12:00</p>
-                        </div>
-                        <div class="header-section__menu-item">
-                            <form class="header-section__form">
-                                <input type="text" name="header-form" placeholder="Укажите номер телефона">
-                                <button class="btn btn--long">Записаться</button>
-                            </form>
-                        </div>
-                    </div>
-
-
-                    <div class="header-block">
-
-
-                        <form action="#" class="header-form">
-                            <select name="" id="" class="header-form__select">
-                                <option value="" class="header-form__option">Выберите адрес</option>
-                                <option value="" class="header-form__option">ул. Авто, д. 100</option>
-                                <option value="" class="header-form__option">ул. Авто, д. 100</option>
-                            </select>
-                            <select name="" id="" class="header-form__select">
-                                <option value="" class="header-form__option">Выберите дату</option>
-                                <option value="" class="header-form__option">Четверг 19</option>
-                                <option value="" class="header-form__option">Среда 19</option>
-                            </select>
-                            <select name="" id="" class="header-form__select">
-                                <option value="" class="header-form__option">Выберите время</option>
-                                <option value="" class="header-form__option">12:00</option>
-                                <option value="" class="header-form__option">11:00</option>
-                            </select>
-
-                            <input type="text" class="header-form__input" placeholder="Укажите номер телефона">
-                            <button class="header-form__btn">Записаться</button>
-                        </form>
-
-
-
-                    </div>
-                    <button class="btn btn--long btn--long-mobile">Записаться</button>
-                </div>
-            </div>
         </div>
+        
 
+        <div class="header-block">
+            <form action="#" class="header-form">
+                <select name="" id="" class="header-form__select">
+                    <option value="" class="header-form__option">Выберите адрес</option>
+                    <option value="" class="header-form__option">ул. Авто, д. 100</option>
+                    <option value="" class="header-form__option">ул. Авто, д. 100</option>
+                </select>
+                <select name="" id="" class="header-form__select">
+                    <option value="" class="header-form__option">Выберите дату</option>
+                    <option value="" class="header-form__option">Четверг 19</option>
+                    <option value="" class="header-form__option">Среда 19</option>
+                </select>
+                <select name="" id="" class="header-form__select">
+                    <option value="" class="header-form__option">Выберите время</option>
+                    <option value="" class="header-form__option">12:00</option>
+                    <option value="" class="header-form__option">11:00</option>
+                </select>
+
+                <input type="text" class="header-form__input" placeholder="Укажите номер телефона">
+                <button class="header-form__btn">Записаться</button>
+            </form>
+            <button class="btn btn--long btn--long-mobile">Записаться</button>
+        </div>
     </div>
 
     <main class="main">

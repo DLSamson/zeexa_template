@@ -5500,3 +5500,86 @@ textarea:focus {
 	padding: 12px;
 	margin-right: 10px;
 }
+
+.header-section {
+	position: relative;
+}
+
+.header-section__content {
+	text-shadow: 0 0 5px #0006;
+}
+
+.header-block {
+	position: absolute;
+	z-index: 1;
+	top: 70%;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+
+.advantages-block__item p {
+	position: relative;
+	margin-bottom: 1rem;
+	margin-left: 2.4rem;
+	font-weight: 600
+}
+
+.advantages-block__item p::before {
+	position: absolute;
+	content: "";
+	width: 12rem;
+	height: 12rem;
+	background: url("../img/home/krug.png") no-repeat;
+	left: -27px;
+	top: -1px
+}
+
+
+.footer-top__phone>*:first-child,
+.footer-top__email>*:first-child {
+	position: relative;
+	display: block
+}
+
+.footer-top__phone>*:first-child::before,
+.footer-top__email>*:first-child::before {
+	position: absolute;
+	content: '';
+	width: 3rem;
+	height: 3rem;
+	top: -3px;
+	left: -30px
+}
+
+
+.footer-top__phone>*:first-child::before {
+	background: url("../img/icon/Calling.svg") no-repeat
+}
+
+.footer-top__email>*:first-child::before {
+	background: url("../img/icon/Message.svg") no-repeat
+}
+
+.footer-top__phone a,
+.footer-top__email a,
+.footer-center__address a {
+	display: block;
+	margin-bottom: 1rem;
+	font-weight: 600
+}
+
+
+.footer-center__address a:first-child {
+	position: relative
+}
+
+.footer-center__address a:first-child::before {
+	position: absolute;
+	content: '';
+	width: 4rem;
+	height: 4rem;
+	background: url("../img/icon/adress.svg") no-repeat;
+	left: -30px;
+	top: -2px
+}

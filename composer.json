@@ -1,0 +1,10 @@
+{
+    "config": {
+        "platform": {
+            "php": "7.4"
+        }
+    },
+    "require": {
+        "larapack/dd": "^1.1"
+    }
+}

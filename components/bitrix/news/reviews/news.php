@@ -30,7 +30,7 @@ $this->setFrameMode(true);
 					<? $APPLICATION->IncludeFile(SITE_TEMPLATE_PATH . '/including_areas/company/reviews/subtitle.php'); ?>
 				</div>
 
-				<a href="#" class="reviews__btn button">Оставить свой отзыв</a>
+				<a href="#form-review" data-fancybox class="reviews__btn button">Оставить свой отзыв</a>
 
 				<? $APPLICATION->IncludeComponent(
 					"bitrix:news.list",

@@ -2732,30 +2732,7 @@ button {
 	padding-right: 1rem;
 	display: block;
 	border: none;
-	background-color: transparent
-}
-
-.vacancies-box__item-input::-webkit-input-placeholder {
-	font-size: 2.4rem;
-	color: #2F80ED
-}
-
-.vacancies-box__item-input::-moz-placeholder {
-	font-size: 2.4rem;
-	color: #2F80ED
-}
-
-.vacancies-box__item-input:-ms-input-placeholder {
-	font-size: 2.4rem;
-	color: #2F80ED
-}
-
-.vacancies-box__item-input::-ms-input-placeholder {
-	font-size: 2.4rem;
-	color: #2F80ED
-}
-
-.vacancies-box__item-input::placeholder {
+	background-color: transparent;
 	font-size: 2.4rem;
 	color: #2F80ED
 }
@@ -5582,4 +5559,86 @@ textarea:focus {
 	background: url("../img/icon/adress.svg") no-repeat;
 	left: -30px;
 	top: -2px
+}
+
+.ajax-form input[type="checkbox"] {
+	display: none;
+}
+
+.ajax-form label.checkbox {
+	flex-direction: row;
+	column-gap: 10px;
+	align-items: center;
+	font-size: 13px;
+	line-height: inherit;
+}
+
+.ajax-form label a {
+	color: #C63235;
+	text-decoration: underline;
+}
+
+.ajax-form span.star {
+	color: red;
+	font-size: 0.9em;
+}
+
+.ajax-form .rating {
+	font-size: 26px;
+}
+
+.ajax-form label.error input,
+.ajax-form label.error button,
+.ajax-form label.error textarea,
+.ajax-form label.error div.photo,
+.ajax-form label.error div.file {
+	color: #C63235 !important;
+	border: 1px solid #C63235 !important;
+}
+
+.text-grey {
+	color: #A1A6AF;
+}
+
+.switch-btn {
+	display: inline-block !important;
+	width: 100%;
+	max-width: 48px;
+	padding: 0 !important;
+	height: 28px !important;
+	border-radius: 16px !important;
+	background: #fff;
+	border: 2px solid #A1A6AF !important;
+	z-index: 0;
+	margin: 0;
+	padding: 0;
+	cursor: pointer;
+	position: relative;
+	transition-duration: 300ms;
+}
+
+.switch-btn::after {
+	content: "";
+	height: 18px;
+	width: 18px;
+	border-radius: 100%;
+	background: #A1A6AF;
+	top: 3px;
+	left: 3px;
+	transition-duration: 300ms;
+	position: absolute;
+	z-index: 1;
+}
+
+.switch-on {
+	border: 2px solid #C63235 !important;
+}
+
+.switch-on::after {
+	left: 23px;
+	background: #f00 !important;
+}
+
+.swiper-slide { 
+	padding: 0 10px 
 }

@@ -14,7 +14,7 @@
 $this->setFrameMode(true);
 ?>
 
-<?php foreach ($arResult['ITEMS'] as $arItem): ?>
+<?php foreach ($arResult['ITEMS'] as $arItem) : ?>
 	<?
 	$this->AddEditAction($arItem['ID'], $arItem['EDIT_LINK'], CIBlock::GetArrayByID($arItem["IBLOCK_ID"], "ELEMENT_EDIT"));
 	$this->AddDeleteAction($arItem['ID'], $arItem['DELETE_LINK'], CIBlock::GetArrayByID($arItem["IBLOCK_ID"], "ELEMENT_DELETE"), array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM')));
@@ -32,12 +32,12 @@ $this->setFrameMode(true);
 					<div class="reviews-block__item-text">
 						<?= $arItem['PROPERTIES']['POST']['VALUE'] ?> ·
 						<span>
-							<?= date('d.m.Y', strtotime($arItem['DATE_ACTIVE_FROM'])) ?>
+							<?= date('d.m.Y', strtotime($arItem['TIMESTAMP_X'])) ?>
 						</span>
 					</div>
 				</div>
 				<div class="reviews-block__rate">
-					<img src="<?= SITE_TEMPLATE_PATH ?>/img/home/reviews-rate.jpg" alt="img">
+					<div class="rating" data-rating-readonly="true" data-rating-value="<?= $arItem['PROPERTIES']['RATING']['VALUE'] ?>" data-rating-stars="5"></div>
 				</div>
 			</div>
 

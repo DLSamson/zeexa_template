@@ -32,8 +32,8 @@
 		<p class="time">
 			<? $APPLICATION->IncludeFile(SITE_TEMPLATE_PATH . '/including_areas/header/header_working_hours.php'); ?>
 		</p>
-		<button class="btn btn--long btn--mobile">Обратный звонок</button>
-		<button class="btn btn--long btn--transparent btn--mobile">Задать вопрос</button>
+		<a class="btn btn--long btn--mobile" data-fancybox href="#form-call">Обратный звонок</a>
+		<a class="btn btn--long btn--transparent btn--mobile" data-fancybox href="#form-question">Задать вопрос</a>
 	</div>
 
 </ul>

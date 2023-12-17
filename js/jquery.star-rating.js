@@ -1,132 +1,167 @@
-(function ($) {
-    $.fn.starRating = function (setup) {
-        let settings = $.extend(true, {
-            wrapperClasses: '',
-            starIconEmpty: 'fa-regular fa-star',
-            starIconFull: 'fa-solid fa-star',
-            starColorEmpty: 'lightgray',
-            starColorFull: '#FFC107',
-            starsSize: 3, // em
-            stars: 5,
-            showInfo: true,
-            titles: ["very bad", "bad", "medium", "good", "very good"],
-            inputName: 'rating'
-        }, setup || {});
+const defaults = {
+    "value": 0,
+    "stars": 5,
+    "half": false,
+    "emptyStar": "far fa-star",
+    "halfStar": "fas fa-star-half-alt",
+    "filledStar": "fas fa-star",
+    "color": "#fcd703",
+    "readonly": false,
+    "click": function (e) {
+        console.error("No click callback provided!");
+    }
+};
 
-        $(this).each(function (i, e) {
-            return init($(e))
-        });
-
-        function getTextColor(value) {
-            switch (true) {
-                case value < (settings.stars / 3):
-                    return 'var(--bs-danger)';
-                case value < (settings.stars / 3 * 2):
-                    return 'var(--bs-warning)';
-                default:
-                    return 'var(--bs-success)';
+jQuery.fn.extend({
+    rating: function (options = {}) {
+        return this.each(function () {
+            if ($(this).attr("rating")) {
+                $(this).empty();
             }
-        }
 
-        function init(wrapper) {
-            if (!wrapper.hasClass('js-wc-star-rating')) {
+            this.stars = options.value ? options.value : defaults.value;
+            this.readonly = options.readonly ? options.readonly : defaults.readonly;
 
-                let starWrapper = $('<div>', {
-                    css: { 'display': 'flex', 'flex-wrap': 'nowrap' }
-                }).appendTo(wrapper);
+            this.getStars = function () {
+                return $(this).find($("i"));
+            };
 
-                for (let i = 1; i <= settings.stars; i++) {
-                    $('<input>', {
-                        type: 'radio',
-                        value: i,
-                        name: settings.inputName,
-                        css: {
-                            display: 'none'
+            $(this).css({
+                "color": options.color ? options.color : defaults.color
+            })
+                .attr("rating", true);
+
+            if (!this.readonly) {
+                $(this).off('mousemove').on('mousemove', function (e) {
+                    let halfStars = options.half ? options.half : defaults.half;
+
+                    if (this.getStars().index(e.target) >= 0) {
+                        if (!halfStars) {
+                            $(this).find("i").attr("class", options.emptyStar ? options.emptyStar : defaults.emptyStar);
+                            let index = this.getStars().index(e.target) + 1;
+
+                            for (let i = 0; i < this.getStars().length; i++) {
+                                if (i < index)
+                                    $(this.getStars()[i]).attr("class", options.filledStar ? options.filledStar : defaults.filledStar)
+                            }
+
+                        } else {
+                            $(this).find("i").attr("class", options.emptyStar ? options.emptyStar : defaults.emptyStar);
+                            let extra = 0.5;
+
+                            $(this).find("i").css({
+                                "width": $(this).find("i").outerWidth()
+                            });
+
+                            if (e.offsetX > ($(e.target).outerWidth() / 2))
+                                extra = 1;
+
+                            let index = this.getStars().index(e.target) + extra;
+                            for (let i = 0; i < this.getStars().length; i++) {
+                                if (i + 0.5 < index) {
+                                    $(this.getStars()[i]).attr("class", options.filledStar ? options.filledStar : defaults.filledStar)
+                                } else if (i < index) {
+                                    $(this.getStars()[i]).attr("class", options.halfStar ? options.halfStar : defaults.halfStar)
+                                }
+                            }
                         }
-                    }).appendTo(starWrapper);
-
-                    $('<i>', {
-                        'data-index': i - 1,
-                        title: settings.titles[i - 1] || i + " Sterne",
-                        css: {
-                            color: settings.starColorEmpty,
-                            margin: '2px',
-                            fontSize: settings.starsSize + 'em'
-                        },
-                        class: settings.starIconEmpty
-                    }).appendTo(starWrapper);
-
-                }
-
-                settings.wrapperClasses.split(' ').forEach(className => {
-                    wrapper.addClass(className);
+                    }
                 });
 
-                if (settings.showInfo) {
-                    $('<strong>', {
-                        html: "0",
-                        class: 'js-wc-rating-value',
-                        css: {
-                            fontSize: "5em"
-                        }
-                    }).insertBefore(starWrapper);
+                $(this).off('mouseout').on('mouseout', function (e) {
+                    this.printStars();
+                });
 
-                    $('<h4>', {
-                        class: 'js-wc-label',
-                        css: {
-                            marginTop: 0
-                        },
-                        html: "Rate us!"
-                    }).insertBefore(starWrapper);
-                }
-                wrapper.css({
-                    'display': 'flex',
-                    'flex-direction': 'column',
-                    'justify-content': 'center',
-                    'align-items': 'center'
-                })
-                wrapper.addClass('js-wc-star-rating');
-                events(wrapper);
+                $(this).off('click').on('click', function (e) {
+                    let halfStars = options.half ? options.half : defaults.half;
+                    if (!halfStars) {
+                        this.stars = this.getStars().index(e.target) + 1;
+                    } else {
+                        let extra = 0.5;
+                        if (e.offsetX > ($(e.target).outerWidth() / 2))
+                            extra = 1;
+
+                        this.stars = this.getStars().index(e.target) + extra;
+                    }
+
+                    const callback = options.click ? options.click : defaults.click;
+                    callback({
+                        "stars": this.stars,
+                        "event": e
+                    });
+                });
             }
 
-            function events(wrapper) {
-                wrapper
-                    .on('click', 'i', function (e) {
-                        let index = $(e.currentTarget).data('index'),
-                            value = index + 1,
-                            titleIndex = Math.floor(settings.titles.length / settings.stars * index),
-                            label = settings.titles[titleIndex] || value + " Sterne";
-                        // select radio
-                        wrapper.find('input[type="radio"][value="' + value + '"]').prop('checked', true);
-                        if (settings.showInfo) {
-                            wrapper.find('.js-wc-rating-value').text(value).css('color', getTextColor(value));
-                            wrapper.find('.js-wc-label').text(label).css('color', getTextColor(value));
-                        }
+            // Add star elements to the element
+            const stars = options.stars ? options.stars : defaults.stars;
+            for (let i = 0; i < stars; i++) {
+                let star = $("<i></i>")
+                    .addClass(options.emptyStar ? options.emptyStar : defaults.emptyStar)
+                    .appendTo($(this));
 
-                        // set stars
-                        let allStars = wrapper
-                            .find('i')
-                            .css('color', settings.starColorEmpty)
-                            .removeClass(settings.starIconFull)
-                            .addClass(settings.starIconEmpty);
-
-                        allStars.each(function (i, e) {
-                            if (i <= index) {
-                                $(e)
-                                    .removeClass(settings.starIconEmpty)
-                                    .addClass(settings.starIconFull)
-                                    .css('color', settings.starColorFull);
-                            }
-                        });
-
-                        wrapper.trigger('change', [value, index]);
+                if (!this.readonly) {
+                    star.css({
+                        "cursor": "pointer"
                     })
+                }
+
+                if (i > 1000)
+                    return;
             }
 
-            return this;
+            this.printStars = function () {
+                let halfStars = options.half ? options.half : defaults.half;
+                if (!halfStars) {
+                    $(this).find("i").attr("class", options.emptyStar ? options.emptyStar : defaults.emptyStar);
+                    for (let i = 0; i < this.stars; i++) {
+                        $(this.getStars()[i]).attr("class", options.filledStar ? options.filledStar : defaults.filledStar)
+                    }
+                } else {
+                    $(this).find("i").attr("class", options.emptyStar ? options.emptyStar : defaults.emptyStar);
+                    for (let i = 0; i < this.stars; i++) {
+                        if (i < this.stars - 0.5) {
+                            $(this.getStars()[i]).attr("class", options.filledStar ? options.filledStar : defaults.filledStar)
+                        } else {
+                            $(this.getStars()[i]).attr("class", options.halfStar ? options.halfStar : defaults.halfStar)
+                        }
+                    }
+                }
+            };
+
+            if (this.stars > 0) {
+                this.printStars();
+
+                const callback = options.click ? options.click : defaults.click;
+                callback({
+                    "stars": this.stars
+                });
+            }
+        });
+    }
+})
+;
+
+$(function () {
+    $("[data-rating-stars]").each(function () {
+        // Get all data-rating attributes
+        let d = {},
+            re_dataAttr = /^data-rating\-(.+)$/;
+
+        $.each($(this).get(0).attributes, function (index, attr) {
+            if (re_dataAttr.test(attr.nodeName)) {
+                let key = attr.nodeName.match(re_dataAttr)[1];
+                d[key] = attr.nodeValue;
+            }
+        });
+
+        // Create the click event handler
+        if (d.input != null) {
+            d.click = function (e) {
+                $(d.input).val(e.stars);
+            }
         }
 
-    };
-}(jQuery));
-
-
+        // Run the rating function on the element
+        $(this).rating(d);
+    });
+});

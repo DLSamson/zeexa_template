@@ -40,7 +40,7 @@ foreach ($arResult['ITEMS'] as $arItem) {
 			<div class="documentation-block__img">
 				<img src="<?= SITE_TEMPLATE_PATH ?>/img/icon/document.svg" alt="img">
 			</div>
-			<a class="documentation-block__item" data-hystmodal="#doc-<?= $arItem['ID'] ?>" href="#">
+			<a class="documentation-block__item" data-fancybox href="#doc-<?= $arItem['ID'] ?>">
 				<div class="documentation-block__item-title">
 					<?= $arItem['NAME'] ?>
 				</div>
@@ -51,15 +51,10 @@ foreach ($arResult['ITEMS'] as $arItem) {
 		</div>
 
 
-		<div style="display:block;">
-			<div class="hystmodal" id="doc-<?= $arItem['ID'] ?>" aria-hidden="true">
-				<div class="hystmodal__wrap">
-					<div class="hystmodal__window" role="dialog" aria-modal="true">
-						<button data-hystclose class="hystmodal__close">Закрыть</button>
-						<img src="<?= $arItem['DISPLAY_PROPERTIES']['DOCUMENT']['FILE_VALUE']['SRC'] ?>" alt=""
+		<div style="display:none;">
+			<div id="doc-<?= $arItem['ID'] ?>" aria-hidden="true">
+				<img src="<?= $arItem['DISPLAY_PROPERTIES']['DOCUMENT']['FILE_VALUE']['SRC'] ?>" alt=""
 							style="margin: 40px auto; border:1px solid #ccc;">
-					</div>
-				</div>
 			</div>
 		</div>
 	<? endforeach; ?>

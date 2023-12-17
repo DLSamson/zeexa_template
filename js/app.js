@@ -61,15 +61,6 @@ function initSliders() {
     }
 }
 
-function initLazyLoad() {
-    const images = document.querySelectorAll('.lazyload');
-    console.log(images);
-    Array.from(images).forEach(image => {
-        const actualSrc = image.dataset['src'] ?? image.src;
-        image.src = actualSrc;
-    });
-}
-
 // Filter
 document.addEventListener('click', (event) => {
     if (event.target.closest('[data-filter-item]')) {
@@ -145,7 +136,6 @@ document.addEventListener('click', (event) => {
 window.addEventListener("load", function (e) {
 
     initSliders();
-    initLazyLoad();
 
     const myModal = new HystModal({
         linkAttributeName: 'data-hystmodal',
@@ -166,12 +156,14 @@ const logger = (prefix) => (message, data = undefined) => log(`${prefix}: ${mess
 
 const fetchAPI = (url, config = {}) => {
     const log = logger('fetchAPI');
-    const defaultConfig = {
+    const ajaxConfig = Object.assign({
         method: 'POST',
-        success: (response) => log('Success', response),
-        error: (error) => log('Error', error),
-    };
-    $.ajax(url, Object.assign(config, defaultConfig));
+        success(response) { log('Success', response) },
+        error(error) { log('Error', error) },
+        complete() { log('Complete') },
+    }, config);
+    log('Request config', { url, ajaxConfig });
+    $.ajax(url, ajaxConfig);
 };
 
 const initModules = (initializers) => {
@@ -216,26 +208,64 @@ const initPhoneMasks = () => {
 const initRatingInput = () => {
     const log = logger('initRatingInput');
     const ratingInput = $('.rating');
-    if (ratingInput.length == 0) {
+    const readOnlyRating = $('.rating.readonly');
+    if (ratingInput.length == 0 || readOnlyRating.length == 0) {
         log('Rating input not found');
         return;
     };
-    log('START', { ratingInput });
+    log('START', { ratingInput, readOnlyRating });
 
-    ratingInput.starRating({
-        starIconEmpty: 'far fa-star',
-        starIconFull: 'fas fa-star',
-        starColorEmpty: 'lightgray',
-        starColorFull: '#FFC107',
-        starsSize: 1.5, // em
+    ratingInput.rating({
         stars: 5,
-        inputName: 'form_text_47',
+        value: 1,
     });
 
-    ratingInput.find('strong, h4').remove();
-    ratingInput.css('align-items', 'start');
+    readOnlyRating.rating({
+        stars: 5,
+        value: 0,
+        readonly: true,
+    });
 
     log('END');
+}
+
+const initCheckboxInputs = () => {
+    const log = logger('initCheckboxInputs');
+    const labels = $('label.checkbox');
+    if (labels.length == 0) {
+        log('Checkbox input not found');
+        return;
+    };
+    log('START');
+
+    const onLabelClick = (event) => {
+        const label = $(event.delegateTarget);
+        const input = $('input[type="checkbox"]', label);
+        const div = $('div.switch-btn', label);
+
+        const isChecked = !input.prop('checked');
+        input.prop('checked', isChecked);
+
+        log('Checkbox clicked', {
+            event, label, input, isChecked, div
+        });
+
+        isChecked
+            ? div.addClass('switch-on')
+            : div.removeClass('switch-on');
+    }
+    $(labels).on('click', onLabelClick);
+
+    log('END');
+}
+
+const initLazyLoad = () => {
+    const images = document.querySelectorAll('.lazyload');
+    console.log(images);
+    Array.from(images).forEach(image => {
+        const actualSrc = image.dataset['src'] ?? image.src;
+        image.src = actualSrc;
+    });
 }
 
 const initAjaxForms = () => {
@@ -250,18 +280,79 @@ const initAjaxForms = () => {
     const onAjaxFormSubmit = (event) => {
         event.preventDefault();
         const form = $(event.delegateTarget);
-        const formData = form.serialize();
-        const paramId = form.data('param-id');
+        const formCommand = form.data('command');
+        const formData = new FormData(form[0]);
 
         log('Form submitted', {
             form, formData
         });
 
-        fetchAPI('/ajax/form.php', {
+        const onFetchApiResponseSuccess = (response) => {
+            log('onFetchApiResponseSuccess', response);
+            form[0].reset();
+            const detached = form.children().detach();
+
+            $('<span>')
+                .delay(3000)
+                .addClass('message')
+                .addClass('title')
+                .text('Ваша заявка успешно отправлена!')
+                .css('color', '#C63235')
+                .css('font-size', '2rem')
+                .css('font-weight', 'bold')
+                .appendTo(form)
+                .delay(3000)
+                .fadeOut(500, () => {
+                    form.children('span.message').first().remove();
+                    form.append(detached);
+                    form.trigger("reset");
+
+                    const inputs = $('input, textarea, select, button', form);
+                    log('Complete success message', { inputs });
+                    inputs.removeAttr('disabled');
+                    inputs.val('');
+                    // Find input with agreement checkbox and set to true
+                    const agreementCheckbox = $('input[type="checkbox"][name="agreement"]');
+                    agreementCheckbox.prop('checked', true);
+                });
+        }
+
+        const onFetchApiResponseError = (xhr, status, error) => {
+            const statusCode = xhr.statusCode().status;
+            log('onFetchApiResponseError', { xhr, status, error, statusCode });
+
+            if (statusCode == 400) {
+                const response = JSON.parse(xhr.responseText);
+                log('Error response', { response, errors: response.data.errors });
+                response.data.errors.forEach(error => {
+                    form
+                        .find(`[name="${error.field}"]`)
+                        .parents('label')
+                        .addClass('error');
+                });
+            }
+        }
+
+        fetchAPI(`/local/templates/zeexa/api/index.php?command=${formCommand}`, {
             method: 'POST',
-            data: form.serializeArray().push(
-                { name: 'param_id', value: paramId }
-            ),
+            data: formData,
+            processData: false,  // tell jQuery not to process the data
+            contentType: false,  // tell jQuery not to set contentType
+            success: onFetchApiResponseSuccess,
+            error: onFetchApiResponseError,
+            beforeSend: () => {
+                const inputs = $('input, textarea, select, button', form);
+                log('Before request', { inputs });
+                inputs
+                    .attr('disabled', true)
+                    .parents('label')
+                    .removeClass('error');
+            },
+            complete: () => {
+                const inputs = $('input, textarea, select, button', form);
+                log('Complete Request', { inputs });
+                inputs.removeAttr('disabled');
+            }
         });
     }
 
@@ -283,13 +374,14 @@ const initFileInputUpload = () => {
         const input = $(event.delegateTarget);
         const parent = input.parent();
         const span = parent.find('span');
+        /** @type {String} */
         const fileName = event.delegateTarget.files[0].name;
 
         log('File selected', {
             input, parent, fileName
         })
 
-        span.text(fileName);
+        span.text(fileName.length > 20 ? fileName.slice(0, 20) + '...' : fileName);
     }
 
     input.on('change', onFileInputChange);
@@ -299,9 +391,11 @@ const initFileInputUpload = () => {
 
 initModules([
     initDebug,
+    initLazyLoad,
     initPhoneMasks,
     initFancyboxSettings,
     initRatingInput,
     initFileInputUpload,
+    initCheckboxInputs,
     initAjaxForms,
 ]);

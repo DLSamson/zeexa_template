@@ -59,9 +59,8 @@ $this->setFrameMode(true);
 					<? $APPLICATION->IncludeFile(SITE_TEMPLATE_PATH . '/including_areas/contacts/contacts_time.php'); ?>
 				</div>
 				<div class="contact-block__button">
-					<a class="contact-block__btn" href="#form-review" data-fancybox data-param-id="9">Задать вопрос</a>
-					<button class="contact-block__btn" data-type="ajax"  href="/ajax/form.php?id=12&data-trigger" data-fancybox-filter="form" data-fancybox data-param-id="9">Обратный
-						звонок</button>
+					<a class="contact-block__btn" href="#form-question" data-fancybox>Задать вопрос</a>
+					<a class="contact-block__btn" href="#form-call" data-fancybox>Обратный звонок</a>
 				</div>
 			</div>
 		</div>

@@ -25,5 +25,5 @@
     <p class="vacancies-block__text">
         <? $APPLICATION->IncludeFile(SITE_TEMPLATE_PATH . '/including_areas/company/vacancy/form/text.php'); ?>
     </p>
-    <a class="vacancies-block__btn button" href="#" data-hystmodal="#myModal">Отправить резюме</a>
+    <a class="vacancies-block__btn button" href="#form-vacancy" data-fancybox>Отправить резюме</a>
 </form>

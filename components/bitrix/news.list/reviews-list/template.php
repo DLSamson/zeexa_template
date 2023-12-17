@@ -28,7 +28,7 @@ $this->setFrameMode(true);
 		</div>
 
 		<div class="confidence-slider">
-			<? foreach ($arResult["ITEMS"] as $key => $arItem): ?>
+			<? foreach ($arResult["ITEMS"] as $key => $arItem) : ?>
 				<?
 				$this->AddEditAction($arItem['ID'], $arItem['EDIT_LINK'], CIBlock::GetArrayByID($arItem["IBLOCK_ID"], "ELEMENT_EDIT"));
 				$this->AddDeleteAction($arItem['ID'], $arItem['DELETE_LINK'], CIBlock::GetArrayByID($arItem["IBLOCK_ID"], "ELEMENT_DELETE"), array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM')));
@@ -47,7 +47,7 @@ $this->setFrameMode(true);
 								<p class="confidence-slider__content-text">
 									<?= $arItem['PROPERTIES']['POST']['VALUE']; ?>
 									·
-									<?= $arItem['DISPLAY_ACTIVE_FROM'] ?>
+									<?= $arItem['TIMESTAMP_X'] ?>
 								</p>
 								<div class="confidence-slider__content-img">
 									<img src="<?= SITE_TEMPLATE_PATH ?>/img/home/reviews-rate.jpg" alt="img">

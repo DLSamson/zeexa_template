@@ -15,7 +15,11 @@ $this->setFrameMode(true);
 ?>
 
 <?php foreach ($arResult['ITEMS'] as $arItem): ?>
-	<div class="stock-item" data-spoiler>
+	<?
+	$this->AddEditAction($arItem['ID'], $arItem['EDIT_LINK'], CIBlock::GetArrayByID($arItem["IBLOCK_ID"], "ELEMENT_EDIT"));
+	$this->AddDeleteAction($arItem['ID'], $arItem['DELETE_LINK'], CIBlock::GetArrayByID($arItem["IBLOCK_ID"], "ELEMENT_DELETE"), array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM')));
+	?>						
+	<div class="stock-item" data-spoiler  id="<?= $this->GetEditAreaId($arItem['ID']); ?>">
 
 		<div class="stock-item__header" data-spoiler-control>
 			<div class="stock-item__media">

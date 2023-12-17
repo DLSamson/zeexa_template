@@ -5,5 +5,8 @@
 
     <?php include 'sms-form.php'; ?>
     <?php include 'review-form.php'; ?>
+    <?php include 'vacancy-form.php'; ?>
+    <?php include 'question-form.php'; ?>
+    <?php include 'call-form.php'; ?>
 
 </div>

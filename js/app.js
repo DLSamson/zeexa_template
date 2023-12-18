@@ -46,7 +46,7 @@ function initSliders() {
         new Swiper('[data-items]', {
             observer: true,
             observeParents: true,
-            slidesPerView: 'auto',
+            slidesPerView:  'auto',
             spaceBetween: 15,
             pagination: {
                 el: '[data-items-pagination]',
@@ -56,6 +56,16 @@ function initSliders() {
                 768: {
                     spaceBetween: 20,
                 },
+            },
+        });
+
+        new Swiper('[data-items-main]', {
+            observer: true,
+            observeParents: true,
+            slidesPerView:  'auto',
+            pagination: {
+                el: '[data-items-pagination]',
+                clickable: true,
             },
         });
     }
@@ -134,9 +144,6 @@ document.addEventListener('click', (event) => {
 })
 
 window.addEventListener("load", function (e) {
-
-    initSliders();
-
     const myModal = new HystModal({
         linkAttributeName: 'data-hystmodal',
     });
@@ -391,6 +398,7 @@ const initFileInputUpload = () => {
 
 initModules([
     initDebug,
+    initSliders,
     initLazyLoad,
     initPhoneMasks,
     initFancyboxSettings,

@@ -50,7 +50,7 @@ $this->setFrameMode(true);
 									<?= $arItem['TIMESTAMP_X'] ?>
 								</p>
 								<div class="confidence-slider__content-img">
-									<img src="<?= SITE_TEMPLATE_PATH ?>/img/home/reviews-rate.jpg" alt="img">
+									<div class="rating" data-rating-readonly="true" data-rating-value="<?= $arItem['PROPERTIES']['RATING']['VALUE'] ?>" data-rating-stars="5"></div>
 								</div>
 							</div>
 						</div>

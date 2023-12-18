@@ -27,7 +27,7 @@
 
             <span class="text-grey">
                 Я согласен на
-                <a href="" data-fancybox data-filter="" data-type="ajax" data-src="/include/licenses_detail.php">обработку персональных данных</a>
+                <a href="" data-fancybox="" data-type="ajax" data-src="/include/licenses_detail.php">обработку персональных данных</a>
             </span>
         </label>
 

@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true)
     die(); ?>
-
 <form class="ajax-form" id="form-vacancy" data-command="form.vacancy">
     <div class="title">Отправить резюме</div>
 
@@ -44,7 +43,7 @@
 
             <span class="text-grey">
                 Я согласен на
-                <a href="" data-fancybox data-filter="" data-type="ajax" data-src="/include/licenses_detail.php">обработку персональных данных</a>
+                <a href="" data-fancybox="" data-type="ajax" data-src="/include/licenses_detail.php">обработку персональных данных</a>
             </span>
         </label>
 

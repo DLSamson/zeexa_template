@@ -5639,6 +5639,10 @@ textarea:focus {
 	background: #f00 !important;
 }
 
-.swiper-slide { 
-	padding: 0 10px 
+.questions-accardion__block-price {
+	cursor: pointer;
+}
+
+.fancybox-content {
+	max-width: 900px;
 }

@@ -38,7 +38,7 @@ $this->setFrameMode(true);
 		</div>
 		<div class="questions-accardion__content">
 			<?= $arItem['DETAIL_TEXT']; ?>
-			<button class="questions__btn button">Отправить резюме</button>
+			<a class="vacancies-block__btn button" data-fancybox href="#form-vacancy">Отправить резюме</a>
 		</div>
 	</form>
 <? endforeach; ?>

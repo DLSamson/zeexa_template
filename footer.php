@@ -1,6 +1,5 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true)
-    die(); ?>
-</main>
+    die(); ?></main>
 
 <footer class="footer">
     <div class="container">
@@ -65,9 +64,9 @@
 <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
 <?php $APPLICATION->IncludeFile(SITE_TEMPLATE_PATH . '/including_areas/footer/footer_maps.php'); ?>
 
-<?php include 'forms/index.php'; ?>
-
 <?php
+include 'forms/index.php';
+
 \Bitrix\Main\Page\Asset::getInstance()->addJs(SITE_TEMPLATE_PATH . '/js/jquery-3.7.1.min.js', true);
 \Bitrix\Main\Page\Asset::getInstance()->addJs(SITE_TEMPLATE_PATH . '/js/jquery.star-rating.js', true);
 \Bitrix\Main\Page\Asset::getInstance()->addJs(SITE_TEMPLATE_PATH . '/js/jquery.fancybox.min.js', true);

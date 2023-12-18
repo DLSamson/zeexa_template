@@ -54,8 +54,8 @@ if (!defined('CURRENT_URI'))
 
             <? $APPLICATION->IncludeFile(SITE_TEMPLATE_PATH . '/including_areas/header/header_main-phone.php'); ?>
 
-            <img class="user-icon" src="<?= SITE_TEMPLATE_PATH ?>/img/icon/user.svg" width="24" height="24" alt=""
-                loading="lazy">
+            <?php /*<img class="user-icon" src="<?= SITE_TEMPLATE_PATH ?>/img/icon/user.svg" width="24" height="24" alt=""
+                loading="lazy">*/?>
 
             <button class="cmn-toggle-switch cmn-toggle-switch__htx" id="menu__button">
                 <span>toggle menu</span>
@@ -156,30 +156,26 @@ if (!defined('CURRENT_URI'))
 			),
 			false
 		); ?>
-        <?php /* 
+        
         <div class="header-block">
-            <form action="#" class="header-form">
-                <select name="" id="" class="header-form__select">
+            <form class="header-form" data-ajaxform data-command="form.lead">
+                <?php 
+                /* <select name="" id="" class="header-form__select">
                     <option value="" class="header-form__option">Выберите адрес</option>
                     <option value="" class="header-form__option">ул. Авто, д. 100</option>
                     <option value="" class="header-form__option">ул. Авто, д. 100</option>
-                </select>
-                <select name="" id="" class="header-form__select">
-                    <option value="" class="header-form__option">Выберите дату</option>
-                    <option value="" class="header-form__option">Четверг 19</option>
-                    <option value="" class="header-form__option">Среда 19</option>
-                </select>
-                <select name="" id="" class="header-form__select">
-                    <option value="" class="header-form__option">Выберите время</option>
-                    <option value="" class="header-form__option">12:00</option>
-                    <option value="" class="header-form__option">11:00</option>
-                </select>
+                </select> */ 
+                ?>
 
-                <input type="text" class="header-form__input" placeholder="Укажите номер телефона">
+                <input type="text" name="name" class="header-form__input" placeholder="Ваше имя">
+                <input type="text" name="car-model" class="header-form__input" placeholder="Марка автомобиля">
+                <input type="text" name="date" class="header-form__input" placeholder="Желаемая дата и время">
+                <input type="text" name="phone" class="inputmask header-form__input" placeholder="Укажите номер телефона">
+
                 <button class="header-form__btn">Записаться</button>
             </form>
             <button class="btn btn--long btn--long-mobile">Записаться</button>
-        </div> */?>
+        </div>
     </div>
 
     <main class="main">

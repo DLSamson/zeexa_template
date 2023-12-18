@@ -12,6 +12,14 @@
 /** @var string $componentPath */
 /** @var CBitrixComponent $component */
 $this->setFrameMode(true);
+
+$arResult['ITEMS'] = collect($arResult['ITEMS'])
+	->toArray();
+
+function getSvgIcon($path) {
+	return file_get_contents($_SERVER['DOCUMENT_ROOT'].'/'.$path);
+}
+
 ?>
 <section class="advantages">
 	<div class="container">
@@ -30,8 +38,8 @@ $this->setFrameMode(true);
 				$this->AddDeleteAction($arItem['ID'], $arItem['DELETE_LINK'], CIBlock::GetArrayByID($arItem["IBLOCK_ID"], "ELEMENT_DELETE"), array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM')));
 				?>
 				<div class="advantages-block__item" id="<?= $this->GetEditAreaId($arItem['ID']); ?>">
-					<div class="advantages-block__item-img">
-						<img src="<?= $arItem["DETAIL_PICTURE"]["SRC"] ?>" alt="img">
+					<div class="advantages-block__item-img" style="display: flex; justify-content: center;">
+						<?= getSvgIcon($arItem["DISPLAY_PROPERTIES"]["TIZER_ICON"]["FILE_VALUE"]['SRC']) ?>
 					</div>
 
 					<div class="advantages-block__item-title">

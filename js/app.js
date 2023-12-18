@@ -277,7 +277,7 @@ const initLazyLoad = () => {
 
 const initAjaxForms = () => {
     const log = logger('initAjaxForms');
-    const ajaxForms = $('.ajax-form');
+    const ajaxForms = $('.ajax-form, [data-ajaxform]');
     if (ajaxForms.length == 0) {
         log('Ajax form not found');
         return;
@@ -334,6 +334,7 @@ const initAjaxForms = () => {
                 response.data.errors.forEach(error => {
                     form
                         .find(`[name="${error.field}"]`)
+                        .addClass('error')
                         .parents('label')
                         .addClass('error');
                 });
@@ -352,6 +353,7 @@ const initAjaxForms = () => {
                 log('Before request', { inputs });
                 inputs
                     .attr('disabled', true)
+                    .removeClass('error')
                     .parents('label')
                     .removeClass('error');
             },

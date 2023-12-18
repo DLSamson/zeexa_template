@@ -28,13 +28,6 @@ $routes = [
             'text' => $request['text']
         ]);
     },
-    'dump' => function (array $request, array $response = []) {
-        sendResponse([
-            '$_POST' => $_POST,
-            '$_REQUEST' => $_REQUEST,
-            '$_SERVER' => $_SERVER,
-        ]);
-    },
     'form.review' => function (array $request, array $response = []) {
         $iblock = [
             'IBLOCK_ID' => 212,
@@ -198,6 +191,39 @@ $routes = [
 
         handleForm($iblock, $getFields, $validationRules, $request);
     },
+    'form.lead' => function (array $request, array $response = []) {
+        $iblock = [
+           'IBLOCK_ID' => 168,
+           'IBLOCK_SECTION' => false,
+           'type' => 'aspro_scorp_form'
+       ];
+       $getFields = function ($data) {
+           /** @var array $fields */
+           $fields = $data['data'];
+
+           $fields = [
+               'NAME' => 'Сообщение формы от '.date('d.m.Y'),
+               'ACTIVE' => 'Y',
+               'PROPERTY_VALUES' => [
+                   'NAME' => $fields['name'],
+                   'AVTO' => $fields['car-model'],
+                   'DATE' => $fields['date'],
+                   'PHONE' => $fields['phone'],
+               ],
+           ];
+           // dd($fields);
+           return $fields;
+       };
+       $validationRules = new Assert\Collection([
+        //    'agreement' => [new Assert\NotNull(), new Assert\EqualTo('on')],
+           'name' => [new Assert\NotBlank(), new Assert\NotNull()],
+           'car-model' => [new Assert\NotBlank(), new Assert\NotNull()],
+           'date' => [new Assert\NotBlank(), new Assert\NotNull()],
+           'phone' => [new Assert\NotBlank(), new Assert\NotNull()],
+       ]);
+
+       handleForm($iblock, $getFields, $validationRules, $request);
+   },
 ];
 
 try {

@@ -5489,7 +5489,7 @@ textarea:focus {
 .header-block {
 	position: absolute;
 	z-index: 1;
-	top: 70%;
+	top: 80%;
 	left: 50%;
 	transform: translateX(-50%);
 }
@@ -5645,4 +5645,43 @@ textarea:focus {
 
 .fancybox-content {
 	max-width: 900px;
+}
+
+.advantages-block__item-img svg path {
+	fill: #C63235;
+}
+
+.header-form__input {
+	margin-left: 0px;
+	font-weight: 600;
+}
+.header-form__input::placeholder {
+	text-align: left;
+}
+.header-form {
+	column-gap: 1rem;
+}
+.header-form__btn {
+	margin-left: 1.5rem;
+	padding: 0 1rem;
+}
+
+.header-block {
+	padding: 1rem 2rem;
+	box-shadow: 0 0 2px 0 #aaa;;
+}
+@media (max-width: 1360px) {
+	.header-block {
+	  max-width: 120rem;
+	  top: 70%;
+	}
+  }
+
+.header-form__input.error {
+	border: 1px solid #C63235;
+	color: #C63235;
+}
+.cmn-toggle-switch__htx {
+	position: absolute;
+  	right: 10px;
 }

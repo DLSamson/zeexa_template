@@ -31,7 +31,7 @@ $arResult['ITEMS'] = collect($arResult['ITEMS'])->filter(fn($item) => $item['IBL
 					<div class="header-section__content">
 						<h1 class="header-section__title"><?= $arItem['~NAME'] ?></h1>
 						<p class="header-section__subtitle"><?= $arItem['PREVIEW_TEXT'] ?></p>
-						<!-- <div class="header-section__menu">
+						<?php /* <div class="header-section__menu">
 							<div class="header-section__menu-item">
 								<p class="menu-item__title"> Выберите адрес</p>
 								<p class="menu-item__info"> ул. Автозаводская, д. 16</p>
@@ -50,7 +50,7 @@ $arResult['ITEMS'] = collect($arResult['ITEMS'])->filter(fn($item) => $item['IBL
 									<button class="btn btn--long">Записаться</button>
 								</form>
 							</div>
-						</div> -->
+						</div> */ ?>
 					</div>
 				</div>
 			</div>

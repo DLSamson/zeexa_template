@@ -23,9 +23,12 @@ $arResult['ITEMS'] = collect($arResult['ITEMS'])->filter(fn($item) => $item['IBL
 			$this->AddDeleteAction($arItem['ID'], $arItem['DELETE_LINK'], CIBlock::GetArrayByID($arItem["IBLOCK_ID"], "ELEMENT_DELETE"), array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM')));
 			?>
 			<div class="swiper-slide" id="<?= $this->GetEditAreaId($arItem['ID']); ?>">
-				<img src="<?= $arItem['DETAIL_PICTURE']['SRC'] ?? SITE_TEMPLATE_PATH . '/img/home/home-bg-1.jpg' ?>" width="1920"
+
+				<?php /* <img src="<?= $arItem['DETAIL_PICTURE']['SRC'] ?? SITE_TEMPLATE_PATH . '/img/home/home-bg-1.jpg' ?>" width="1920"
+				height="" alt="" loading="lazy"> */?>
+
+				<img src="https://nivus.ru/upload/iblock/83b/5d6b5sqeztw3gmz1a17ymdos7f82v9q6.jpg" width="1920"
 					height="" alt="" loading="lazy">
-		
 		
 				<div class="container-dem container--main">
 					<div class="header-section__content">

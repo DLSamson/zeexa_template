@@ -398,6 +398,247 @@ const initFileInputUpload = () => {
     log('END');
 }
 
+
+const fetchNivusApi = (path, settings) => {
+    const log = logger('fetchNivusApi');
+    const url = `/local/templates/zeexa/api/index.php?command=api&uri=${path}`;
+
+    log('Request config', { url, settings });
+    return $.ajax(url, Object.assign({
+        method: 'GET',
+        dataType: 'json',
+        contentType: 'application/json',
+        success(response) { log('Success', response) },
+        error(error) { log('Error', error) },
+        complete() { log('Complete') },
+    }, settings));
+}
+
+const initServices = () => {
+    const log = logger('initServices');
+    const container = $('.stock-page');
+    if(container.length == 0) {
+        log('Container not found');
+        return;
+    }
+    log('START');
+
+    const state = {
+        currentStep: 1,
+        currentMaxStep: 1,
+        maxScreens: null,
+        minScreens: 1,
+    }
+    const inputs = {}
+
+    const stepsContainer = $('[data-services-steps]', container);
+    const steps = $('[data-services-step]', stepsContainer);
+    const getCurrentStep = () => steps.filter((i, step) => $(step).data('services-step') == state.currentStep)
+    state.maxScreens = steps.length;
+
+    const screenContainer = $('[data-services-screens]', container);
+    const screens = $('[data-services-screen]', screenContainer);
+    const getCurrentScreen = () => screens.filter((i, screen) => $(screen).data('services-screen') == state.currentStep)
+
+    const nextButton = $('[data-services-next]', container);
+    const prevButton = $('[data-services-prev]', container);
+    
+    const updateScreen = () => {
+        screens.attr('disabled', true);
+        const currentScreen = getCurrentScreen().removeAttr('disabled');
+        screenInitializers[state.currentStep](currentScreen);
+    }
+    const updateStep = () => {
+        steps.toArray().map(step => $(step)
+            .removeClass('active')
+            .attr('disabled', true)
+        )
+            .filter(step => $(step).data('services-step') <= state.currentMaxStep)
+            .forEach(step => $(step).removeAttr('disabled'));
+
+        getCurrentStep().addClass('active');
+    }
+    const update = () => {
+        log('Current state: ',state);
+        updateStep();
+        updateScreen();
+    }
+
+    /* @TODO Учесть переключение назад, чтобы заного выбрать модель и поколение */
+    const onNextButtonClick = (event) => {
+        event?.preventDefault();
+        if(state.currentStep < state.maxScreens) {
+            state.currentMaxStep += 1;
+            state.currentStep += 1;
+        }
+        log('State', {state, inputs});
+        update();
+    }
+    const onPrevButtonClick = (event) => {
+        event?.preventDefault();
+        if(state.currentStep > state.minScreens) {
+            state.currentStep -= 1;    
+        }
+        log('State', {state, inputs});
+        update();
+    }
+    const onStepClick = (event) => {
+        event.preventDefault();
+        state.currentStep = $(event.delegateTarget).data('services-step');
+        if(state.currentStep < 3) {
+            state.currentMaxStep = state.currentStep;
+        }
+        log('State', {state, inputs});
+        update();
+    }
+
+    const screenInitializersState = {
+        markInitialized: 0,
+        markPage: 0,
+    }
+    const screenInitializers = {
+        1: (screen) => {
+            if(screenInitializersState.markInitialized == 2) return;
+            const popularMarksContainer = $('[data-marks-popular]', screen).empty();
+            const popularLoader = $('<div>').addClass('loader').appendTo(popularMarksContainer);
+            try{popularMarksContainer.slick('unslick').hide();}catch(e){}
+            log('popularMark', {popularMarksContainer, popularLoader});
+            
+            fetchNivusApi('/api/brands/popular', {
+                success(response) {
+                    log('Success', response);
+
+                    popularLoader.remove();
+                    popularMarksContainer.show().append(response.map(mark => 
+                        //<a href="" data-popular-mark="id">{cyrillicName}</a>
+                        $('<a>')
+                            .attr('href', '')
+                            .attr('data-popular-mark', mark.id)    
+                            .text(mark.cyrillicName ?? mark.name)
+                            .on('click', function(event) {
+                                event?.preventDefault();
+                                popularMarksContainer.find('[data-popular-mark]').removeClass('active');
+                                allMarksContainer.find('[data-mark]').removeClass('active');
+                                $(this).addClass('active');
+                                inputs.mark = $(this).data('popular-mark');
+                            })
+                    ));
+
+                    popularMarksContainer.slick({
+                        arrows: false,
+                        infinite: false,
+                        slidesToShow: 6,
+                        slidesToScroll: 6,
+                        rows: 1,
+                        dots: true,
+                        responsive: {
+                            768: {
+                                slidesToShow: 3,
+                                slidesToScroll: 3
+                            },
+                        }
+                    });
+
+                    screenInitializersState.markInitialized++;
+                },
+            });
+
+            const allMarksContainer = $('[data-marks]', screen).empty();
+            const allMarksLoader = $('<div>').addClass('loader').appendTo(allMarksContainer);
+            log('allMarksContainer', {allMarksContainer, allMarksLoader});
+
+            fetchNivusApi('/api/brands', {
+                data: {
+                    page: screenInitializersState.markPage++,
+                    size: (6*8)-1,
+                },
+                success(response) {
+                    log('Success', {response, allMarksLoader});
+                    allMarksLoader.remove();
+                    allMarksContainer.append(response.map(mark =>
+                        $('<a>')
+                            .attr('href', '')
+                            .attr('data-mark', mark.id)
+                            .text(mark.cyrillicName ?? mark.name)
+                            .on('click', function(event) {
+                                event?.preventDefault();
+                                popularMarksContainer.find('[data-popular-mark]').removeClass('active');
+                                allMarksContainer.find('[data-mark]').removeClass('active');
+                                $(this).addClass('active');
+                                inputs.mark = $(this).data('mark');
+                            })
+                    ));
+
+                    screenInitializersState.markInitialized++;
+                }
+            });
+        },
+        2: (screen) => {
+            const allModelsContainer = $('[data-models]', screen).empty();
+            const allModelsLoader = $('<div>').addClass('loader').appendTo(allModelsContainer);
+            log('allModelsContainer', {allModelsContainer, allModelsLoader});
+
+            fetchNivusApi('/api/models', {
+                data: {brand: inputs.mark},
+                success(response) {
+                    log('Success', {response, allModelsLoader});
+                    allModelsLoader.remove();
+                    allModelsContainer.append(response.map(model =>
+                        $('<a>')
+                            .attr('href', '')
+                            .attr('data-model', model.id)
+                            .text(model.cyrillicName ?? model.name)
+                            .on('click', function(event) {
+                                event?.preventDefault();
+                                allModelsContainer.find('[data-model]').removeClass('active');
+                                $(this).addClass('active');
+                                inputs.model = $(this).data('model');
+                            })
+                    ));
+                } 
+            });
+        },
+        3: (screen) => {
+            const allGenerationsContainer = $('[data-generations]', screen).empty();
+            const allGenerationsLoader = $('<div>').addClass('loader').appendTo(allGenerationsContainer);
+            log('allGenerationsContainer', {allGenerationsContainer, allGenerationsLoader});
+
+            fetchNivusApi('/api/serials', {
+                data: {model: inputs.model},
+                success(response) {
+                    log('Success', {response, allGenerationsLoader});
+                    allGenerationsLoader.remove();
+                    allGenerationsContainer.append(response.map(generation =>
+                        $('<a>')
+                            .attr('href', '')
+                            .attr('data-generation', generation.id)
+                            .text(generation.cyrillicName ?? generation.name)
+                            .on('click', function(event) {
+                                event?.preventDefault();
+                                allGenerationsContainer.find('[data-generation]').removeClass('active');
+                                $(this).addClass('active');
+                                inputs.generation = $(this).data('generation');
+                            })
+                    ));
+                } 
+            });
+        },
+        4: (screen) => {
+
+        },
+        5: (screen) => {
+
+        },
+    }
+
+    nextButton.on('click', onNextButtonClick);
+    prevButton.on('click', onPrevButtonClick);
+    steps.on('click', onStepClick);
+    
+    update();
+    log('END');
+}
+
 initModules([
     initDebug,
     initSliders,
@@ -408,4 +649,5 @@ initModules([
     initFileInputUpload,
     initCheckboxInputs,
     initAjaxForms,
+    initServices,
 ]);

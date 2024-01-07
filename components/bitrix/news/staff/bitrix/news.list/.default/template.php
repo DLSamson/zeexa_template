@@ -40,7 +40,6 @@ $getName = function ($i) {
 	}
 }
 	?>
-
 <? foreach ($itemsBySection as $sectionId => $items): ?>
 	<?
 	$section = CIBlockSection::GetByID($sectionId)->GetNext();
@@ -61,16 +60,17 @@ $getName = function ($i) {
 					$this->AddEditAction($arItem['ID'], $arItem['EDIT_LINK'], CIBlock::GetArrayByID($arItem["IBLOCK_ID"], "ELEMENT_EDIT"));
 					$this->AddDeleteAction($arItem['ID'], $arItem['DELETE_LINK'], CIBlock::GetArrayByID($arItem["IBLOCK_ID"], "ELEMENT_DELETE"), array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM')));
 					?>
-					
-						<a class="swiper-slide" href="<?= $arItem['DETAIL_PAGE_URL'] ?>"  id="<?= $this->GetEditAreaId($arItem['ID']); ?>">
-							<img src="<?= $arItem["PREVIEW_PICTURE"]["SRC"] ?>" width="335" height="360" alt="" loading="lazy">
-							<p class="name">
-								<?= $arItem["NAME"] ?>
-							</p>
-							<p class="position">
+					<a class="swiper-slide" href="<?= $arItem['DETAIL_PAGE_URL'] ?>"  id="<?= $this->GetEditAreaId($arItem['ID']); ?>">
+						<img src="<?= $arItem["PREVIEW_PICTURE"]["SRC"] ?>" width="335" height="360" alt="" loading="lazy">
+						<div class="card__content">
+							<div class="card__title">
+								<span><?= $arItem["NAME"] ?></span>
+							</div>
+							<div class="card__staff">
 								<?= $arItem["PROPERTIES"]["POST"]["VALUE"] ?>
-							</p>
-						</a>
+							</div>
+						</div>
+					</a>
 				<? endforeach; ?>
 			</div>
 			<div class="swiper-pagination"></div>

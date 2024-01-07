@@ -11,11 +11,13 @@ define('PUBLIC_AJAX_MODE', true);
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.php");
 require_once dirname(__FILE__, 2) . '/vendor/autoload.php';
 
+use DI\Bridge\Slim\Bridge;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use URLify;
+use Bitrix\Main\Data\Cache;
 
 $routes = [
     'ping' => function (array $request, array $response = []) {
@@ -117,7 +119,7 @@ $routes = [
 
         handleForm($iblock, $getFields, $validationRules, $request);
     },
-    'form.question' => function (array $request, array $response = []) {
+    'form.question' => function (array $request, array $response = []) {    
          $iblock = [
             'IBLOCK_ID' => 188,
             'IBLOCK_SECTION' => false,
@@ -224,12 +226,34 @@ $routes = [
 
        handleForm($iblock, $getFields, $validationRules, $request);
    },
+    'api' => function(array $request, array $response = []){
+        $builder = new \DI\ContainerBuilder();
+	    $builder->useAutowiring(true);
+	    $builder->useAnnotations(false);
+		$builder->addDefinitions([
+			Cache::class => DI\factory(fn() => Cache::createInstance()),
+		]);
+	    $container = $builder->build();
+
+        $app = Bridge::create($container);
+		$routes = require 'routes.php';
+		$routes($app);
+
+		$_SERVER['REQUEST_URI'] = $request['data']['uri'];
+		$_SERVER['ORIG_PATH_INFO'] = $request['data']['uri'];
+
+        $app->run();
+   },
 ];
 
 try {
     handleRequest($routes);
 } catch (Throwable $e) {
-    sendResponse(null, 500, $e->getMessage());
+    sendResponse([
+	    'message' => $e->getMessage(),
+	    'code' => $e->getCode(),
+	    'file' => $e->getFile(),
+    ], 500, 'Error occurred');
 }
 
 /**
@@ -242,7 +266,7 @@ function handleRequest(array $routes = []): void
 {
     $command = $_GET['command'] ?? '';
     $handler = $routes[$command] ?? null;
-    $requestData = collect($_POST)
+    $requestData = collect($_REQUEST)
         ->map(function ($value) {
             return $value === ''
                 ? null : $value;
@@ -262,7 +286,7 @@ function handleRequest(array $routes = []): void
     ];
 
     if (!$handler) {
-        sendResponse(null, 404, 'Method not Implemented');
+        sendResponse(null, 403, 'Method Not Allowed');
     }
 
     $handler($requestData);

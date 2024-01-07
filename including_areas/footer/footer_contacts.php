@@ -1,1 +1,1 @@
-<a href="#" class="">+7 (495) 132-13-22</a> <a href="#" class="footer-top__phone-link">+7 (495) 106-39-30</a> <a href="#" class="footer-top__phone-link">+7 (495) 620-35-37</a>
+<a class="footer-top__phone-link"  href="tel:+74956203536">+7(495) 620-35-36</a> <a href="tel:+74951063930" class="footer-top__phone-link">+7 (495) 106-39-30</a> <a href="tel:+74956203537" class="footer-top__phone-link">+7 (495) 620-35-37</a>

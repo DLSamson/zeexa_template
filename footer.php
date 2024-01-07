@@ -66,6 +66,9 @@
 
 <?php
 include 'forms/index.php';
+$path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'].'/'.SITE_DIR.'include/');
+$file = $path.'invis-counter.php';
+@include_once $file; 
 
 \Bitrix\Main\Page\Asset::getInstance()->addJs(SITE_TEMPLATE_PATH . '/js/jquery-3.7.1.min.js', true);
 \Bitrix\Main\Page\Asset::getInstance()->addJs(SITE_TEMPLATE_PATH . '/js/jquery.star-rating.js', true);

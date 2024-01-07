@@ -1,12 +1,1 @@
-<a href="" class="footer__bottom-social-link">
-    <img src="<?= SITE_TEMPLATE_PATH ?>/img/icon/youtube.svg" alt="img">
-</a>
-<a href="" class="footer__bottom-social-link">
-    <img src="<?= SITE_TEMPLATE_PATH ?>/img/icon/whatsap.svg" alt="img">
-</a>
-<a href="" class="footer__bottom-social-link">
-    <img src="<?= SITE_TEMPLATE_PATH ?>/img/icon/insta.svg" alt="img">
-</a>
-<a href="" class="footer__bottom-social-link">
-    <img src="<?= SITE_TEMPLATE_PATH ?>/img/icon/vk.svg" alt="img">
-</a>
+<a href="" class="footer__bottom-social-link"> <img alt="img" src="/local/templates/zeexa/img/icon/youtube.svg"> </a> <a href="https://wa.me/79255143438" class="footer__bottom-social-link"> <img alt="img" src="/local/templates/zeexa/img/icon/whatsap.svg"> </a> <a href="" class="footer__bottom-social-link"> <img alt="img" src="/local/templates/zeexa/img/icon/insta.svg"> </a> <a href="http://vkontakte.ru/tehnivus" class="footer__bottom-social-link"> <img alt="img" src="/local/templates/zeexa/img/icon/vk.svg"> </a>

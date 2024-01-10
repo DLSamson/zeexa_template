@@ -424,8 +424,8 @@ const initServices = () => {
     log('START');
 
     const state = {
-        currentStep: 1,
-        currentMaxStep: 1,
+        currentStep: 4,
+        currentMaxStep: 4,
         maxScreens: null,
         minScreens: 1,
     }

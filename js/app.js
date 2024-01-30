@@ -46,7 +46,7 @@ function initSliders() {
         new Swiper('[data-items]', {
             observer: true,
             observeParents: true,
-            slidesPerView:  'auto',
+            slidesPerView: 'auto',
             spaceBetween: 15,
             pagination: {
                 el: '[data-items-pagination]',
@@ -62,7 +62,7 @@ function initSliders() {
         new Swiper('[data-items-main]', {
             observer: true,
             observeParents: true,
-            slidesPerView:  'auto',
+            slidesPerView: 'auto',
             pagination: {
                 el: '[data-items-pagination]',
                 clickable: true,
@@ -417,7 +417,7 @@ const fetchNivusApi = (path, settings) => {
 const initServices = () => {
     const log = logger('initServices');
     const container = $('.stock-page');
-    if(container.length == 0) {
+    if (container.length == 0) {
         log('Container not found');
         return;
     }
@@ -442,11 +442,12 @@ const initServices = () => {
 
     const nextButton = $('[data-services-next]', container);
     const prevButton = $('[data-services-prev]', container);
-    
+
     const updateScreen = () => {
         screens.attr('disabled', true);
         const currentScreen = getCurrentScreen().removeAttr('disabled');
         screenInitializers[state.currentStep](currentScreen);
+        nextButton.find('span').text(state.currentStep == state.maxScreens ? 'Записаться' : 'Продолжить');
     }
     const updateStep = () => {
         steps.toArray().map(step => $(step)
@@ -459,36 +460,57 @@ const initServices = () => {
         getCurrentStep().addClass('active');
     }
     const update = () => {
-        log('Current state: ',state);
+        log('Current state: ', state);
         updateStep();
         updateScreen();
     }
 
-    /* @TODO Учесть переключение назад, чтобы заного выбрать модель и поколение */
     const onNextButtonClick = (event) => {
         event?.preventDefault();
-        if(state.currentStep < state.maxScreens) {
+
+        if (state.currentStep == state.maxScreens) {
+            nextButton.attr('disabled', true);
+            fetchAPI(`/local/templates/zeexa/api/index.php?command=form.services`, {
+                data: inputs,
+                success(response) {
+                    const modal = $('<div>')
+                        .addClass('services-modal')
+                        .text('Вы успешно записались');
+
+                    $.fancybox.open(modal);
+                },
+                error() {
+                    const modal = $('<div>')
+                        .addClass('services-modal')
+                        .text('Не все поля заполнены');
+
+                    $.fancybox.open(modal);
+                }
+            })
+        }
+
+        if (state.currentStep < state.maxScreens) {
             state.currentMaxStep += 1;
             state.currentStep += 1;
         }
-        log('State', {state, inputs});
+        log('State', { state, inputs });
         update();
     }
     const onPrevButtonClick = (event) => {
         event?.preventDefault();
-        if(state.currentStep > state.minScreens) {
-            state.currentStep -= 1;    
+        if (state.currentStep > state.minScreens) {
+            state.currentStep -= 1;
         }
-        log('State', {state, inputs});
+        log('State', { state, inputs });
         update();
     }
     const onStepClick = (event) => {
         event.preventDefault();
         state.currentStep = $(event.delegateTarget).data('services-step');
-        if(state.currentStep < 3) {
+        if (state.currentStep < 3) {
             state.currentMaxStep = state.currentStep;
         }
-        log('State', {state, inputs});
+        log('State', { state, inputs });
         update();
     }
 
@@ -498,30 +520,37 @@ const initServices = () => {
     }
     const screenInitializers = {
         1: (screen) => {
-            if(screenInitializersState.markInitialized == 2) return;
+            if (screenInitializersState.markInitialized == 2) return;
             const popularMarksContainer = $('[data-marks-popular]', screen).empty();
             const popularLoader = $('<div>').addClass('loader').appendTo(popularMarksContainer);
-            try{popularMarksContainer.slick('unslick').hide();}catch(e){}
-            log('popularMark', {popularMarksContainer, popularLoader});
-            
+            try { popularMarksContainer.slick('unslick').hide(); } catch (e) { }
+            log('popularMark', { popularMarksContainer, popularLoader });
+
             fetchNivusApi('/api/brands/popular', {
                 success(response) {
                     log('Success', response);
 
                     popularLoader.remove();
-                    popularMarksContainer.show().append(response.map(mark => 
-                        //<a href="" data-popular-mark="id">{cyrillicName}</a>
+                    popularMarksContainer.show().append(response.map(mark =>
+                        //<a href="" data-popular-mark="id">{name}</a>
                         $('<a>')
                             .attr('href', '')
-                            .attr('data-popular-mark', mark.id)    
-                            .text(mark.cyrillicName ?? mark.name)
-                            .on('click', function(event) {
+                            .attr('data-popular-mark', mark.id)
+                            // .text(mark.name)
+                            .on('click', function (event) {
                                 event?.preventDefault();
                                 popularMarksContainer.find('[data-popular-mark]').removeClass('active');
                                 allMarksContainer.find('[data-mark]').removeClass('active');
                                 $(this).addClass('active');
                                 inputs.mark = $(this).data('popular-mark');
                             })
+                            .addClass('popular-mark')
+                            .append(
+                                $('<img>')
+                                    .attr('src', `/local/templates/zeexa/img/logos/brands/${mark.name}.png`)
+                                    .attr('alt', mark.name)
+                                    .addClass('popular-mark-logo')
+                            )
                     ));
 
                     popularMarksContainer.slick({
@@ -531,12 +560,29 @@ const initServices = () => {
                         slidesToScroll: 6,
                         rows: 1,
                         dots: true,
-                        responsive: {
-                            768: {
-                                slidesToShow: 3,
-                                slidesToScroll: 3
+                        responsive: [
+                            {
+                                breakpoint: 1200,
+                                settings: {
+                                    slidesToShow: 4,
+                                    slidesToScroll: 4
+                                }
                             },
-                        }
+                            {
+                                breakpoint: 768,
+                                settings: {
+                                    slidesToShow: 3,
+                                    slidesToScroll: 3
+                                }
+                            },
+                            {
+                                breakpoint: 450,
+                                settings: {
+                                    slidesToShow: 2,
+                                    slidesToScroll: 2
+                                }
+                            }
+                        ],
                     });
 
                     screenInitializersState.markInitialized++;
@@ -545,22 +591,22 @@ const initServices = () => {
 
             const allMarksContainer = $('[data-marks]', screen).empty();
             const allMarksLoader = $('<div>').addClass('loader').appendTo(allMarksContainer);
-            log('allMarksContainer', {allMarksContainer, allMarksLoader});
+            log('allMarksContainer', { allMarksContainer, allMarksLoader });
 
             fetchNivusApi('/api/brands', {
                 data: {
                     page: screenInitializersState.markPage++,
-                    size: (6*8)-1,
+                    size: (6 * 8) - 1,
                 },
                 success(response) {
-                    log('Success', {response, allMarksLoader});
+                    log('Success', { response, allMarksLoader });
                     allMarksLoader.remove();
                     allMarksContainer.append(response.map(mark =>
                         $('<a>')
                             .attr('href', '')
                             .attr('data-mark', mark.id)
-                            .text(mark.cyrillicName ?? mark.name)
-                            .on('click', function(event) {
+                            .text(mark.name)
+                            .on('click', function (event) {
                                 event?.preventDefault();
                                 popularMarksContainer.find('[data-popular-mark]').removeClass('active');
                                 allMarksContainer.find('[data-mark]').removeClass('active');
@@ -576,67 +622,341 @@ const initServices = () => {
         2: (screen) => {
             const allModelsContainer = $('[data-models]', screen).empty();
             const allModelsLoader = $('<div>').addClass('loader').appendTo(allModelsContainer);
-            log('allModelsContainer', {allModelsContainer, allModelsLoader});
+            log('allModelsContainer', { allModelsContainer, allModelsLoader });
 
             fetchNivusApi('/api/models', {
-                data: {brand: inputs.mark},
+                data: { brand: inputs.mark },
                 success(response) {
-                    log('Success', {response, allModelsLoader});
+                    log('Success', { response, allModelsLoader });
                     allModelsLoader.remove();
                     allModelsContainer.append(response.map(model =>
                         $('<a>')
                             .attr('href', '')
                             .attr('data-model', model.id)
-                            .text(model.cyrillicName ?? model.name)
-                            .on('click', function(event) {
+                            .text(model.name)
+                            .on('click', function (event) {
                                 event?.preventDefault();
                                 allModelsContainer.find('[data-model]').removeClass('active');
                                 $(this).addClass('active');
                                 inputs.model = $(this).data('model');
                             })
                     ));
-                } 
+                }
             });
         },
         3: (screen) => {
             const allGenerationsContainer = $('[data-generations]', screen).empty();
             const allGenerationsLoader = $('<div>').addClass('loader').appendTo(allGenerationsContainer);
-            log('allGenerationsContainer', {allGenerationsContainer, allGenerationsLoader});
+            log('allGenerationsContainer', { allGenerationsContainer, allGenerationsLoader });
 
             fetchNivusApi('/api/serials', {
-                data: {model: inputs.model},
+                data: { model: inputs.model },
                 success(response) {
-                    log('Success', {response, allGenerationsLoader});
+                    log('Success', { response, allGenerationsLoader });
                     allGenerationsLoader.remove();
                     allGenerationsContainer.append(response.map(generation =>
                         $('<a>')
                             .attr('href', '')
-                            .attr('data-generation', generation.id)
-                            .text(generation.cyrillicName ?? generation.name)
-                            .on('click', function(event) {
+                            .attr('data-generation', generation.name)
+                            .text(generation.name)
+                            .on('click', function (event) {
                                 event?.preventDefault();
                                 allGenerationsContainer.find('[data-generation]').removeClass('active');
                                 $(this).addClass('active');
                                 inputs.generation = $(this).data('generation');
                             })
                     ));
-                } 
+                }
             });
         },
         4: (screen) => {
+            if (screenInitializersState.isServicesInited) return;
 
+            const form = $(screen).find('form');
+            const serviceGroups = form.children();
+            const services = serviceGroups.find('[data-service-item]');
+            const searchInput = $('input[name=search]', screen);
+
+            services.each((i, service) => {
+                const onInputChange = (event) => {
+                    const input = $(event.delegateTarget);
+                    const btn = $(service).find('.stock-item__item-select-btn');
+                    if (!inputs.services)
+                        inputs.services = [];
+
+                    if (input.prop('checked')) {
+                        inputs.services.push({
+                            id: input.data('id'),
+                            text: input.val()
+                        });
+                        btn.text('Отменить');
+                    }
+                    else {
+                        inputs.services = inputs.services
+                            .filter(service =>
+                                service.id !== input.data('id'));
+                        btn.text('Выбрать');
+                    }
+                    log('Input change', {
+                        services: inputs.services,
+                        btn,
+                        input,
+                        service
+                    });
+                }
+
+                $('input', service).on('change', onInputChange);
+
+                $('.stock-item__item-select-btn', service).on('click', (event) => {
+                    const input = $('input', service);
+                    input.click();
+                    log('btn clicked', { input, service });
+                });
+            });
+
+            const onSearchInputChange = (event) => {
+                const input = $(event.delegateTarget);
+                /** @var {string} searchText */
+                const searchText = input.val().toLowerCase();
+                log('Search input change', { input, searchText });
+
+                if (searchText === '')
+                    serviceGroups.show();
+
+                serviceGroups.each((i, group) => {
+                    let found = false;
+                    const services = $('[data-service-item]', group);
+                    services.each((i, service) => {
+                        /** @var {string} text */
+                        $(service).hide();
+                        const text = $(service).find('input').val();
+                        if (text.toLowerCase().includes(searchText)) {
+                            found = true;
+                            $(service).show();
+                        }
+                        log('Service text', { text, searchText });
+                    });
+
+                    // log('Found', { group, found });
+                    found
+                        ? $(group).show()
+                        : $(group).hide();
+                });
+            }
+
+            searchInput.on('input', onSearchInputChange);
+
+            screenInitializersState.isServicesInited = true;
         },
         5: (screen) => {
+            log('Inputs', { inputs });
+            if (!screenInitializersState.isFormInited) {
+                const onChange = (event) => {
+                    const target = $(event.delegateTarget);
+                    log('Input change', { target, event, inputs });
+                    inputs[target.attr('name')] = $(event.delegateTarget).val();
+                };
+                $('[name=phone]', screen).on('keyup', onChange);
+                $('[name=win-number]', screen).on('keyup', onChange);
+                $('[name=gos-number]', screen).on('keyup', onChange);
+                $('[name=address]', screen).on('change', onChange);
+                $('[name=date]', screen).on('change', onChange);
+                $('[name=time]', screen).on('change', onChange);
 
+                fetchNivusApi('/api/offices', {
+                    success(response) {
+                        const select = $('[name="address"]', screen);
+                        log('Success', { response, select });
+                        select.append(response.map(office =>
+                            $('<option>')
+                                .val(office.address)
+                                .text(office.address)
+                        ));
+                    }
+                })
+
+                screenInitializersState.isFormInited = true;
+            };
+
+            log('Setting inputs');
+            $('[name=mark]', screen).val(inputs.mark);
+            $('[name=model]', screen).val(inputs.model);
+            $('[name=generation]', screen).val(inputs.generation);
         },
     }
 
     nextButton.on('click', onNextButtonClick);
     prevButton.on('click', onPrevButtonClick);
     steps.on('click', onStepClick);
-    
+
     update();
     log('END');
+}
+
+const baseApiPath = '/local/templates/zeexa/api/index.php?command=api';
+const getPath = (path) => {
+    const url = new URL(baseApiPath, window.location);
+    url.searchParams.append('uri', path);
+    return url.toString();
+}
+
+
+
+const services = {
+    auth: {
+        tokenName: 'auth_token',
+        isLoggedIn() {
+            return !!Cookie.get(this.tokenName);
+        },
+        setToken(token) {
+            Cookie.set(this.tokenName, token, {secure: true});
+        },
+        async sendCode(phone) {
+            const response = await axios.post(getPath('/api/auth/send-code'), {
+                phone
+            });
+            return response.data;
+        },
+        async getToken(phone, code) {
+            const response = await axios.post(getPath('/api/auth/token'), {
+                phone, code
+            });
+            return response.data.token;
+        },
+
+        modals: {
+            phone: () => $('#form-sms'),
+            code: () => $('#form-sms-code'),
+
+            showPhone() {
+                $.fancybox.open(this.phone());
+            },
+            showCode(initCounter = false) {
+                const modal = this.code();
+                $.fancybox.open(modal);
+                modal.find('[name=code]').first().focus();
+
+                if (initCounter) {
+                    log('Init counter', { initCounter });
+                    this.codeStartCounter(modal);
+                }
+            },
+            counter: 0,
+            codeStartCounter(modal, 
+                onCounterEnd = () => { setTimeout(this.codeStartCounter, 1000) }
+            ) {
+                const text = $('[data-counter-text]', modal);
+                const counter = $('[data-counter]', modal);
+                const twoMinutes = 2 * 60 * 1000;
+                const timeEnd = Date.now() + twoMinutes;
+                log('Start counter', { text, counter, timeEnd });
+
+                text.html('Отправить код повторно <span data-counter>через 1:59</span>');
+
+                const interval = setInterval(() => {
+                    const timeLeft = timeEnd - Date.now();
+                    this.counter = timeLeft;
+                    const timeLeftIso = new Date(timeLeft).toISOString().slice(14, 19);
+                    // log('counter', { timeLeftIso, counter });
+                    
+
+                    counter.html(`через ${timeLeftIso}`);
+
+                    if (timeLeft > 0) {
+                        return;
+                    }
+
+                    clearInterval(interval);
+                    text.html('Получить код еще раз');
+                    onCounterEnd(text, counter);
+                    return;
+                }, 1000);
+            }
+        },
+    }
+}
+
+const initAuth = () => {
+    const log = logger('initAuth');
+    const loginButton = $('[data-login-button]');
+    const phoneForm = services.auth.modals.phone();
+    const codeForm = services.auth.modals.code();
+    log('START', {
+        loginButton,
+        phoneForm,
+        codeForm
+    });
+
+    let currentForm = 'phone';
+    const inputs = {};
+
+    const onPhoneKeyUp = (event) => {
+        log('Phone keyup', { event, inputs });
+        const input = $(event.delegateTarget);
+        inputs.phone = input.val();
+    }
+
+    const onPhoneFormSubmit = async (event) => {
+        log('onPhoneFormSubmit', { event, inputs });
+        event.preventDefault();
+        phoneForm.find('[name=phone]').removeClass('error');
+
+        try {
+            const response = await services.auth.sendCode(inputs.phone);    
+            $.fancybox.close();
+            services.auth.modals.showCode(true);
+        } catch (error) {
+            phoneForm.find('[name=phone]').addClass('error');
+        }
+    }
+
+    const onCodeInputKeyUp = (event) => {
+        event.preventDefault();
+        const codeInputs = codeForm.find('[name=code]');
+        codeInputs.removeClass('error');
+        
+        inputs.code = codeInputs.map((i, input) => $(input).val()).toArray().join('');
+        log('Code keyup', { event, inputs });
+    }
+
+    const onCodeFormSubmit = async (event) => {
+        log('onCodeFormSubmit', { event, inputs });
+        event.preventDefault();
+        codeForm.find('[name=code]').removeClass('error');
+
+        try {
+            const token = await services.auth.getToken(inputs.phone, inputs.code);
+            services.auth.setToken(token);
+            location.reload();
+        } catch (error) {
+            codeForm.find('[name=code]').addClass('error');
+        }
+    }
+
+    const onLoginButtonClick = (event) => {
+        log('onLoginButtonClick', { event, currentForm });
+        event.preventDefault();
+        if (currentForm == 'phone') {
+            services.auth.modals.showPhone();
+        }
+        else if (currentForm == 'code') {
+            services.auth.modals.showCode(true);
+        }
+    }
+
+    loginButton.on('click', onLoginButtonClick);
+    phoneForm.on('submit', onPhoneFormSubmit);
+    phoneForm.find('[name=phone]').on('keyup', onPhoneKeyUp);
+
+    codeForm.on('submit', onCodeFormSubmit);
+    services.auth.modals.code().find('[name=code]').on('keyup', onCodeInputKeyUp);
+
+    log('END');
+}
+
+const initAxios = () => {
+    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    axios.defaults.headers.common['Content-Type'] = 'application/json';
 }
 
 initModules([
@@ -650,4 +970,6 @@ initModules([
     initCheckboxInputs,
     initAjaxForms,
     initServices,
+    initAuth,
+    initAxios,
 ]);

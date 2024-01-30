@@ -8,5 +8,7 @@
     <?php include 'vacancy-form.php'; ?>
     <?php include 'question-form.php'; ?>
     <?php include 'call-form.php'; ?>
+    <?php include 'lead-form.php'; ?>
+    <?php include 'sms-form.php'; ?>
 
 </div>

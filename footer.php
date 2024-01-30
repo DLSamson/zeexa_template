@@ -1,5 +1,6 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true)
-    die(); ?></main>
+    die(); ?>
+</main>
 
 <footer class="footer">
     <div class="container">
@@ -62,13 +63,16 @@
 </footer>
 
 <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
 <?php $APPLICATION->IncludeFile(SITE_TEMPLATE_PATH . '/including_areas/footer/footer_maps.php'); ?>
 
 <?php
 include 'forms/index.php';
-$path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'].'/'.SITE_DIR.'include/');
-$file = $path.'invis-counter.php';
-@include_once $file; 
+$path = str_replace('//', '/', $_SERVER['DOCUMENT_ROOT'] . '/' . SITE_DIR . 'include/');
+$file = $path . 'invis-counter.php';
+@include_once $file;
 
 \Bitrix\Main\Page\Asset::getInstance()->addJs(SITE_TEMPLATE_PATH . '/js/jquery-3.7.1.min.js', true);
 \Bitrix\Main\Page\Asset::getInstance()->addJs(SITE_TEMPLATE_PATH . '/js/jquery.star-rating.js', true);

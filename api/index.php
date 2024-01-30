@@ -11,13 +11,17 @@ define('PUBLIC_AJAX_MODE', true);
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/modules/main/include/prolog_before.php");
 require_once dirname(__FILE__, 2) . '/vendor/autoload.php';
 
+use Bitrix\Main\Data\Cache;
 use DI\Bridge\Slim\Bridge;
-use Symfony\Component\Validator\Validation;
+use Error;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolation;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Validation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use URLify;
-use Bitrix\Main\Data\Cache;
+use function DI\factory;
+
 
 $routes = [
     'ping' => function (array $request, array $response = []) {
@@ -41,15 +45,15 @@ $routes = [
             $fields = $data['data'];
             /** @var UploadedFile[] $files */
             $files = collect($data['files'])
-                ->map(function(UploadedFile $file, $name) {
-                    return uploadFile($_SERVER['DOCUMENT_ROOT']."/upload/reviews/$name", $file);
+                ->map(function (UploadedFile $file, $name) {
+                    return uploadFile($_SERVER['DOCUMENT_ROOT'] . "/upload/reviews/$name", $file);
                 });
 
             $fields = [
                 'NAME' => $fields['name'],
                 'PREVIEW_TEXT' => $fields['message'],
                 'PREVIEW_PICTURE' => CFILE::MakeFileArray($files['photo']),
-                'CODE' => URLify::slug($fields['name'].'-'.uniqid()),
+                'CODE' => URLify::slug($fields['name'] . '-' . uniqid()),
                 'ACTIVE' => 'N',
                 'PROPERTY_VALUES' => [
                     'EMAIL' => $fields['email'],
@@ -78,7 +82,7 @@ $routes = [
         handleForm($iblock, $getFields, $validationRules, $request);
     },
     'form.vacancy' => function (array $request, array $response = []) {
-         $iblock = [
+        $iblock = [
             'IBLOCK_ID' => 187,
             'IBLOCK_SECTION' => false,
             'type' => 'aspro_allcorp3_form'
@@ -88,12 +92,12 @@ $routes = [
             $fields = $data['data'];
             /** @var UploadedFile[] $files */
             $files = collect($data['files'])
-                ->map(function(UploadedFile $file, $name) {
-                    return uploadFile($_SERVER['DOCUMENT_ROOT']."/upload/vacancy/$name", $file);
+                ->map(function (UploadedFile $file, $name) {
+                    return uploadFile($_SERVER['DOCUMENT_ROOT'] . "/upload/vacancy/$name", $file);
                 });
 
             $fields = [
-                'NAME' => 'Заявка от '.date('d.m.Y'),
+                'NAME' => 'Заявка от ' . date('d.m.Y'),
                 'ACTIVE' => 'N',
                 'PROPERTY_VALUES' => [
                     'FIO' => $fields['name'],
@@ -119,8 +123,8 @@ $routes = [
 
         handleForm($iblock, $getFields, $validationRules, $request);
     },
-    'form.question' => function (array $request, array $response = []) {    
-         $iblock = [
+    'form.question' => function (array $request, array $response = []) {
+        $iblock = [
             'IBLOCK_ID' => 188,
             'IBLOCK_SECTION' => false,
             'type' => 'aspro_allcorp3_form'
@@ -130,12 +134,12 @@ $routes = [
             $fields = $data['data'];
             /** @var UploadedFile[] $files */
             $files = collect($data['files'])
-                ->map(function(UploadedFile $file, $name) {
-                    return uploadFile($_SERVER['DOCUMENT_ROOT']."/upload/vacancy/$name", $file);
+                ->map(function (UploadedFile $file, $name) {
+                    return uploadFile($_SERVER['DOCUMENT_ROOT'] . "/upload/vacancy/$name", $file);
                 });
 
             $fields = [
-                'NAME' => 'Вопрос от '.date('d.m.Y'),
+                'NAME' => 'Вопрос от ' . date('d.m.Y'),
                 'ACTIVE' => 'N',
                 'PROPERTY_VALUES' => [
                     'NAME' => $fields['name'],
@@ -152,7 +156,7 @@ $routes = [
             'agreement' => [new Assert\NotNull(), new Assert\EqualTo('on')],
             'name' => [new Assert\NotBlank(), new Assert\NotNull()],
             'phone' => [new Assert\NotBlank(), new Assert\NotNull()],
-            'product' =>new Assert\Optional( [new Assert\NotBlank(), new Assert\NotNull()]),
+            'product' => new Assert\Optional([new Assert\NotBlank(), new Assert\NotNull()]),
             'message' => new Assert\Optional([new Assert\NotBlank(), new Assert\NotNull()]),
             'email' => new Assert\Optional([new Assert\NotBlank(), new Assert\NotNull(), new Assert\Email()]),
         ]);
@@ -160,7 +164,7 @@ $routes = [
         handleForm($iblock, $getFields, $validationRules, $request);
     },
     'form.call' => function (array $request, array $response = []) {
-         $iblock = [
+        $iblock = [
             'IBLOCK_ID' => 189,
             'IBLOCK_SECTION' => false,
             'type' => 'aspro_allcorp3_form'
@@ -170,12 +174,12 @@ $routes = [
             $fields = $data['data'];
             /** @var UploadedFile[] $files */
             $files = collect($data['files'])
-                ->map(function(UploadedFile $file, $name) {
-                    return uploadFile($_SERVER['DOCUMENT_ROOT']."/upload/vacancy/$name", $file);
+                ->map(function (UploadedFile $file, $name) {
+                    return uploadFile($_SERVER['DOCUMENT_ROOT'] . "/upload/vacancy/$name", $file);
                 });
 
             $fields = [
-                'NAME' => 'Заявка от '.date('d.m.Y'),
+                'NAME' => 'Заявка от ' . date('d.m.Y'),
                 'ACTIVE' => 'N',
                 'PROPERTY_VALUES' => [
                     'FIO' => $fields['name'],
@@ -195,64 +199,118 @@ $routes = [
     },
     'form.lead' => function (array $request, array $response = []) {
         $iblock = [
-           'IBLOCK_ID' => 168,
-           'IBLOCK_SECTION' => false,
-           'type' => 'aspro_scorp_form'
-       ];
-       $getFields = function ($data) {
-           /** @var array $fields */
-           $fields = $data['data'];
+            'IBLOCK_ID' => 168,
+            'IBLOCK_SECTION' => false,
+            'type' => 'aspro_scorp_form'
+        ];
+        $getFields = function ($data) {
+            /** @var array $fields */
+            $fields = $data['data'];
 
-           $fields = [
-               'NAME' => 'Сообщение формы от '.date('d.m.Y'),
-               'ACTIVE' => 'Y',
-               'PROPERTY_VALUES' => [
-                   'NAME' => $fields['name'],
-                   'AVTO' => $fields['car-model'],
-                   'DATE' => $fields['date'],
-                   'PHONE' => $fields['phone'],
-               ],
-           ];
-           // dd($fields);
-           return $fields;
-       };
-       $validationRules = new Assert\Collection([
-        //    'agreement' => [new Assert\NotNull(), new Assert\EqualTo('on')],
-           'name' => [new Assert\NotBlank(), new Assert\NotNull()],
-           'car-model' => [new Assert\NotBlank(), new Assert\NotNull()],
-           'date' => [new Assert\NotBlank(), new Assert\NotNull()],
-           'phone' => [new Assert\NotBlank(), new Assert\NotNull()],
-       ]);
+            $fields = [
+                'NAME' => 'Сообщение формы от ' . date('d.m.Y'),
+                'ACTIVE' => 'Y',
+                'PROPERTY_VALUES' => [
+                    'NAME' => $fields['name'],
+                    'AVTO' => $fields['car-model'],
+                    'DATE' => $fields['date'],
+                    'PHONE' => $fields['phone'],
+                ],
+            ];
+            // dd($fields);
+            return $fields;
+        };
+        $validationRules = new Assert\Collection([
+            //    'agreement' => [new Assert\NotNull(), new Assert\EqualTo('on')],
+            'name' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'car-model' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'date' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'phone' => [new Assert\NotBlank(), new Assert\NotNull()],
+        ]);
 
-       handleForm($iblock, $getFields, $validationRules, $request);
-   },
-    'api' => function(array $request, array $response = []){
+        handleForm($iblock, $getFields, $validationRules, $request);
+    },
+    'form.services' => function (array $request, array $response = []) {
+        $iblock = [
+            'IBLOCK_ID' => 168,
+            'IBLOCK_SECTION' => false,
+            'type' => 'aspro_scorp_form'
+        ];
+        $getFields = function ($data) {
+            /** @var array $fields */
+            $fields = $data['data'];
+
+            // dd(collect($fields['services']));
+    
+            $fields = [
+                'NAME' => 'Запись из конструктора, в ' . $fields['address'] . ' на ' . $fields['date'] . ' в ' . $fields['time'],
+                'ACTIVE' => 'Y',
+                'PROPERTY_VALUES' => [
+                    'PHONE' => $fields['phone'],
+                    'INFO' => implode(", \n", [
+                        'Бренд: ' . $fields['mark'],
+                        'Модель: ' . $fields['model'],
+                        'Серия: ' . $fields['generation'],
+                        'Win-Номер: ' . $fields['win-number'],
+                        'Гос-Номер: ' . $fields['gos-number'],
+                        'Адрес: ' . $fields['address'],
+                        'Дата: ' . $fields['date'],
+                        'Время: ' . $fields['time'],
+                        "Услуги: \n\t" . implode("\n\t", collect($fields['services'])
+                            ->map(fn($el) => $el['text'])->toArray()),
+                    ]),
+                ],
+            ];
+            // dd($fields);
+            return $fields;
+        };
+        $validationRules = new Assert\Collection([
+            'phone' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'mark' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'model' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'generation' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'win-number' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'gos-number' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'address' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'date' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'time' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'services' => [new Assert\NotBlank(), new Assert\NotNull()],
+        ]);
+
+        handleForm($iblock, $getFields, $validationRules, $request);
+    },
+    'api' => function (array $request, array $response = []) {
         $builder = new \DI\ContainerBuilder();
-	    $builder->useAutowiring(true);
-	    $builder->useAnnotations(false);
-		$builder->addDefinitions([
-			Cache::class => DI\factory(fn() => Cache::createInstance()),
-		]);
-	    $container = $builder->build();
+        $builder->useAutowiring(true);
+        $builder->useAnnotations(false);
+        $builder->addDefinitions([
+            Cache::class => \DI\factory(fn() => Cache::createInstance()),
+            ValidatorInterface::class => \DI\factory(fn() => Validation::createValidator()),
+        ]);
+        $container = $builder->build();
 
         $app = Bridge::create($container);
-		$routes = require 'routes.php';
-		$routes($app);
+        $routes = require 'routes.php';
+        $routes($app);
 
-		$_SERVER['REQUEST_URI'] = $request['data']['uri'];
-		$_SERVER['ORIG_PATH_INFO'] = $request['data']['uri'];
+        $app->addRoutingMiddleware();
+        $app->addErrorMiddleware(true, true, true);
+        $app->addBodyParsingMiddleware();
+
+        $_SERVER['REQUEST_URI'] = $_GET['uri'];
+        $_SERVER['ORIG_PATH_INFO'] = $_GET['uri'];
 
         $app->run();
-   },
+    },
 ];
 
 try {
     handleRequest($routes);
 } catch (Throwable $e) {
     sendResponse([
-	    'message' => $e->getMessage(),
-	    'code' => $e->getCode(),
-	    'file' => $e->getFile(),
+        'message' => $e->getMessage(),
+        'code' => $e->getCode(),
+        'file' => $e->getFile(),
     ], 500, 'Error occurred');
 }
 
@@ -266,15 +324,15 @@ function handleRequest(array $routes = []): void
 {
     $command = $_GET['command'] ?? '';
     $handler = $routes[$command] ?? null;
-    $requestData = collect($_REQUEST)
+    $requestData = collect($_POST)
         ->map(function ($value) {
             return $value === ''
                 ? null : $value;
         })
-        ->filter(fn ($val) => !is_null($val));
+        ->filter(fn($val) => !is_null($val));
 
     $files = collect($_FILES)
-        ->filter(fn ($value) => $value['error'] == 0)
+        ->filter(fn($value) => $value['error'] == 0)
         ->map(function ($value) {
             //string $path, string $originalName, string $mimeType = null
             // sendResponse($value);
@@ -331,7 +389,7 @@ function handleForm(array $iblock, $getFields, $validationRules, array $data)
         ->merge($iblock)
         ->toArray();
 
-    $iblock =  new \CIBlockElement();
+    $iblock = new \CIBlockElement();
     $iblock_id = $iblock->Add($params);
 
 
@@ -346,12 +404,12 @@ function handleForm(array $iblock, $getFields, $validationRules, array $data)
 }
 
 
-function uploadFile(string $directory, UploadedFile $file): string 
+function uploadFile(string $directory, UploadedFile $file): string
 {
     $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
     $safeFilename = URLify::slug($originalFilename);
-    $fileName = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+    $fileName = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
     $file->move($directory, $fileName);
 
-    return $directory.'/'.$fileName;
+    return $directory . '/' . $fileName;
 }

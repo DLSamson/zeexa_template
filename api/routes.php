@@ -1,6 +1,8 @@
 <?php
+namespace App;
 
 use App\Controllers\PingController;
+use App\Middlewares\AuthMiddleware;
 use App\Middlewares\JsonMiddleware;
 use Slim\App;
 use Slim\Routing\RouteCollectorProxy;
@@ -18,6 +20,17 @@ return function (App $app) {
 
 		$group->post('/auth/send-code', [\App\Controllers\AuthController::class, 'sendCode']);
 		$group->post('/auth/token', [\App\Controllers\AuthController::class, 'getToken']);
+
+		$group->group('', function (RouteCollectorProxy $group) { 
+			$group->get('/auth/user', [\App\Controllers\AuthController::class, 'getUser']);
+			$group->post('/auth/user/update', [\App\Controllers\AuthController::class, 'updateUser']);
+
+			$group->post('/cars/my', [\App\Controllers\CarController::class, 'addCar']);
+
+			$group->post('/maintance', [\App\Controllers\MaintanceController::class, 'addMaintance']);
+			$group->post('/maintance/cancel', [\App\Controllers\MaintanceController::class, 'cancelMaintance']);
+
+		})->add(AuthMiddleware::class);
 	})
 		->add(JsonMiddleware::class);
 };

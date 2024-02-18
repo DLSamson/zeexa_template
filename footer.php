@@ -54,6 +54,10 @@
                 <div class="footer__bottom-text">
                     <? $APPLICATION->IncludeFile(SITE_TEMPLATE_PATH . '/including_areas/footer/footer_credentials.php'); ?>
                 </div>
+                <div class="footer__bottom-text">
+                    Наши сервисы находятся рядом<br>
+                    с метро Автозаводская и Яхромская
+                </div>
                 <div class="footer__bottom-social">
                     <? $APPLICATION->IncludeFile(SITE_TEMPLATE_PATH . '/including_areas/footer/footer_socials.php'); ?>
                 </div>
@@ -65,6 +69,7 @@
 <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" type="text/javascript"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>  
 
 <?php $APPLICATION->IncludeFile(SITE_TEMPLATE_PATH . '/including_areas/footer/footer_maps.php'); ?>
 

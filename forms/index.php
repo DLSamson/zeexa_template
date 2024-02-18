@@ -10,5 +10,8 @@
     <?php include 'call-form.php'; ?>
     <?php include 'lead-form.php'; ?>
     <?php include 'sms-form.php'; ?>
-
+    
+    <?php include 'add-car-form.php'; ?>
+    <?php include 'add-maintance-form.php'; ?>
+    
 </div>

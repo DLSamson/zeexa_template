@@ -17,6 +17,7 @@ use App\Services\ApiService;
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css">
+
 	<?php
 	$APPLICATION->ShowMeta("viewport");
 	$APPLICATION->ShowMeta("HandheldFriendly");
@@ -28,7 +29,9 @@ use App\Services\ApiService;
 	\Bitrix\Main\Page\Asset::getInstance()->addCss(SITE_TEMPLATE_PATH . '/css/style.min.css');
 	\Bitrix\Main\Page\Asset::getInstance()->addCss(SITE_TEMPLATE_PATH . '/css/swiper-bundle.css');
 	\Bitrix\Main\Page\Asset::getInstance()->addCss(SITE_TEMPLATE_PATH . '/css/hystmodal.min.css');
+	\Bitrix\Main\Page\Asset::getInstance()->addCss(SITE_TEMPLATE_PATH . '/css/nice-select.css');
 	\Bitrix\Main\Page\Asset::getInstance()->addCss(SITE_TEMPLATE_PATH . '/css/update.css');
+
 
 	$APPLICATION->ShowCSS(true, $bXhtmlStyle);
 	$APPLICATION->ShowHeadStrings();
@@ -109,9 +112,26 @@ use App\Services\ApiService;
 				false
 			); ?>
 
-			<a href="" class="btn btn--long" data-login-button>
-				<?= getApi()->isAuthenticated() ? 'Личный кабинет' : 'Войти' ?>
-			</a>
+			<? $user = getApi()->getUser(); ?>
+			
+			<? if($user): ?>
+				<a class="header__user" href="/login">
+					<div class="header__user-avatar"><?= substr($user->name, 0, 1); ?></div>
+					<div class="header__user-name"><?= $user->name ?></div>
+					<div class="header__user-arrow">
+						<img src="<?= SITE_TEMPLATE_PATH ?>/img/icon/arrows-select.svg" alt="">
+					</div>
+				</a>
+			<? else: ?>
+				<a 
+				href="" 
+				class="btn btn--long"
+				data-login-button
+				>
+					Войти
+				</a>
+			<? endif; ?>
+			
 		</header>
 
 		<? $APPLICATION->IncludeComponent(

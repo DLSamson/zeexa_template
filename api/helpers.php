@@ -14,3 +14,12 @@ if(!function_exists('getApi'))
         );
     }
 }
+
+if(!function_exists('render')) {
+    function render(string $path, $data = []) {
+        (function ($path, $data)  {
+            extract($data);
+            require $_SERVER['DOCUMENT_ROOT'] . '/local/templates/zeexa/api/Templates/' . $path;
+        })($path, $data);
+    }
+}

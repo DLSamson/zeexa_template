@@ -15,9 +15,9 @@ class ApiService
 	protected static $user = null;
 	protected Curl $curl;
 	protected Cache $cache;
-	protected const BASE_URL = 'http://45.132.50.122:8081';
+	public const BASE_URL = 'http://45.132.50.122:8081';
 
-	protected const TOKEN_NAME = 'auth_token';
+	public const TOKEN_NAME = 'auth_token';
 
 
 	public const NOT_VALID = 'NOT_VALID';
@@ -32,7 +32,7 @@ class ApiService
 		$this->cache = $cache;
 	}
 
-	protected function setCache(string $name, int $timeToLive, array $data)
+	protected function setCache(string $name, int $timeToLive = 3600, ?array $data = [])
 	{
 		$this->cache->initCache($timeToLive, $name, '/api/' . md5($name));
 		$this->cache->startDataCache();

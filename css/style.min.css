@@ -5717,7 +5717,7 @@ textarea:focus {
 @media (max-width: 1360px) {
 	.header-block {
 		max-width: 120rem;
-		top: 70%;
+		top: 65%;
 	}
 }
 
@@ -6362,9 +6362,19 @@ textarea::placeholder {
 	color: #333;
 }
 
+.header_auth-icon {
+	margin-right: 24px;
+}
+
 @media(max-width: 1199px) {
 	.header__user {
 		margin-right: 30px;
+		display: none;
+	}
+	.header__user-arrow,
+	.header__user-name {
+		display: none;
+
 	}
 }
 
@@ -6628,4 +6638,58 @@ textarea::placeholder {
 
 .footer__bottom {
 	align-items: center;
+}
+
+[data-counter-text] {
+	cursor: pointer;
+}
+
+.header-form__inputs [data-dropdown] {
+	padding: 0;
+	background: transparent;
+}
+
+.header-form__inputs [data-dropdown-list] {
+	width: fit-content;
+	top: 110%;
+}
+
+.header-form__inputs > label {
+	min-width: 220px;
+	padding: 10px 20px;
+}
+
+.header-form__inputs > label > span {
+	font-size: 20px;
+	color: #000;
+	position: relative;
+	padding-right: 15px;
+}
+
+.header-form__inputs > label > span::after {
+	content: url('../img/icon/arrows-select.svg');
+	position: absolute;
+	width: 15px;
+	height: 15px;
+	top: 3px; 
+	right: 0px;
+	
+}
+
+.header-form__inputs [data-dropdown-list] {
+	width: 130%;
+}
+
+.header-form__inputs [data-dropdown] {
+	margin-top: 0;;
+}
+
+.header-form__inputs > label [data-dropdown-current] {
+	font-size: 18px !important;
+	color: #828282;
+	background: transparent;
+}
+
+[data-dropdown-list] > li {
+	cursor: pointer;
 }

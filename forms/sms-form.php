@@ -1,5 +1,12 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true)
-    die(); ?>
+    die();  
+
+use Carbon\Carbon;
+
+$api = getApi();
+$user = $api->getUser();
+
+?>
 
 <form class="sms__block" id="form-sms">
 
@@ -24,10 +31,10 @@
     <div class="sms-code__title">Авторизация</div>
 
     <div class="sms-code__box">
-        <input type="text" name="code" class="sms-code__input" placeholder="">
-        <input type="text" name="code" class="sms-code__input" placeholder="">
-        <input type="text" name="code" class="sms-code__input" placeholder="">
-        <input type="text" name="code" class="sms-code__input" placeholder="">
+        <input type="text" maxlength="1" data-code="0" required name="code" class="sms-code__input" placeholder="">
+        <input type="text" maxlength="1" data-code="1" required name="code" class="sms-code__input" placeholder="">
+        <input type="text" maxlength="1" data-code="2" required name="code" class="sms-code__input" placeholder="">
+        <input type="text" maxlength="1" data-code="3" required name="code" class="sms-code__input" placeholder="">
     </div>
 
     <div href="" class="sms-code__text" data-counter-text>
@@ -43,27 +50,53 @@
     
     <div class="fields">
         <div class="nivus__box">
-            <div class="nivus__box-btn button" data-gender="M">Я-мужчина</div>
-            <div class="nivus__box-btn button nivus__box-btn--disabled" data-gender="F">Я-женщина</div>
+            <div 
+                class="nivus__box-btn button <?= $user->gender == 'M' ? 'nivus__box-btn--disabled' : ''?>" 
+                data-gender="M"
+            >
+                Я-мужчина
+            </div>
+            <div 
+                class="nivus__box-btn button <?= $user->gender == 'M' ? '' : 'nivus__box-btn--disabled'?>"
+                data-gender="F"
+            >
+                Я-женщина
+            </div>
         </div>
 
         <label>
             <span>Имя</span>
-            <input type="text" name="name" placeholder="">
+            <input type="text" 
+                name="name" 
+                placeholder="" 
+                value="<?= $user->name ?>"
+            >
         </label>
 
         <label>
             <span>Фамилия</span>
-            <input type="text" name="surname" placeholder="">
+            <input type="text" 
+                name="surname" 
+                placeholder="" 
+                value="<?= $user->surname ?>"
+            >
         </label>
 
         <label>
             Отчество
-            <input type="text" name="patronymic" placeholder="">
+            <input type="text" 
+                name="patronymic" 
+                placeholder="" 
+                value="<?= $user->patronymic ?>"
+            >
         </label>
 
         <label class="checkbox">
-            <input type="checkbox" name="nopatronymic" value="on" id="">
+            <input type="checkbox" 
+                name="nopatronymic" 
+                value="on"
+                <?= $user->nopatronymic ? 'checked' : ''?>
+            >
             <div class="switch-btn"></div>
 
             <span style="font-size: 2rem;">Нет отчества</span>
@@ -71,7 +104,12 @@
 
         <label>
             Дата рождения
-            <input type="text" name="birthdate" placeholder="29.07.2023">
+            <input 
+                type="text" 
+                name="birthdate" 
+                placeholder="" 
+                value="<?= Carbon::parse($user->birthday)->format('d.m.Y'); ?>"
+            >
         </label>
 
     </div>

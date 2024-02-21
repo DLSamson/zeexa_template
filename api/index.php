@@ -211,10 +211,10 @@ $routes = [
                 'NAME' => 'Сообщение формы от ' . date('d.m.Y'),
                 'ACTIVE' => 'Y',
                 'PROPERTY_VALUES' => [
-                    'NAME' => $fields['name'],
-                    'AVTO' => $fields['car-model'],
-                    'DATE' => $fields['date'],
+                    'NAME' => $fields['name'] ?? '_',
+                    'DATE' => $fields['date']. ' ' . $fields['time'],
                     'PHONE' => $fields['phone'],
+                    'INFO' => $fields['address'],
                 ],
             ];
             // dd($fields);
@@ -222,8 +222,8 @@ $routes = [
         };
         $validationRules = new Assert\Collection([
             //    'agreement' => [new Assert\NotNull(), new Assert\EqualTo('on')],
-            'name' => [new Assert\NotBlank(), new Assert\NotNull()],
-            'car-model' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'address' => [new Assert\NotBlank(), new Assert\NotNull()],
+            'time' => [new Assert\NotBlank(), new Assert\NotNull()],
             'date' => [new Assert\NotBlank(), new Assert\NotNull()],
             'phone' => [new Assert\NotBlank(), new Assert\NotNull()],
         ]);

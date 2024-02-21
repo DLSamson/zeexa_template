@@ -4,23 +4,19 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true)
 
 use Carbon\Carbon;
 use App\Services\ApiService;
-use App\Services\MaintanceStatus;
 use function getApi;
 
 $api = getApi();
-
 $user = $api->getUser();
-
 $maintances = $api->getUserMaintances();
 $cars = $api->getUserCars();
 
 if (!$user) {
-	// header('Location: /');
-	// setcookie(ApiService::TOKEN_NAME, '', time() - 3600);
+	header('Location: /');
+	setcookie(ApiService::TOKEN_NAME, '', time() - 3600);
 }
 
-Carbon::setLocale('ru');
-
+$currentScreen = $_GET['screen'] ?? null;
 ?>
 
 <section class="personal entry-page">
@@ -28,13 +24,13 @@ Carbon::setLocale('ru');
 		<h1 class="personal__title">Личный кабинет</h1>
 		<div class="personal-tabs">
 			<div class="personal-tabs__item">
-				<button class="personal-tabs__item-btn">Запись</button>
-				<button class="personal-tabs__item-btn">Гараж</button>
-				<button class="personal-tabs__item-btn">Настройки</button>
+				<button class="personal-tabs__item-btn <?= $currentScreen == 'maintance' || !$currentScreen ? 'personal-tabs--active' : ''; ?>">Запись</button>
+				<button class="personal-tabs__item-btn <?= $currentScreen == 'garage' ? 'personal-tabs--active' : ''; ?>">Гараж</button>
+				<button class="personal-tabs__item-btn <?= $currentScreen == 'settings' ? 'personal-tabs--active' : ''; ?>">Настройки</button>
 			</div>
 
 
-			<div class="personal-tabs__content">
+			<div class="personal-tabs__content <?= $currentScreen == 'maintance' || !$currentScreen ? 'show' : 'hide'; ?>">
 				<?php foreach ($maintances as $maintance) : ?>
 					<?php $car = $maintance->car; ?>
 					<a href="#maintance-<?= $maintance->id; ?>" data-fancybox="" class="entry-page__inner">
@@ -60,68 +56,7 @@ Carbon::setLocale('ru');
 					</a>
 
 					<div class="hidden">
-						<form class="ajax-form maintance-form" id="maintance-<?= $maintance->id; ?>">
-							<div class="center fit-content maintance-status-icon">
-								<img src="<?= SITE_TEMPLATE_PATH ?>/img/icon/
-									<?= $maintance->status === ApiService::UNDER_MAINTANCE
-										? 'big_working.png'
-										:  'big_check.png'
-									?>" alt="">
-							</div>
-
-							<div class="center fit-content maintance-status-message">
-								<?= $maintance->status === ApiService::UNDER_MAINTANCE
-									? 'Обслуживание'
-									: 'Вы записаны' ?>
-							</div>
-
-							<div class="center fit-content maintance-status-time">
-								<?= Carbon::parse($maintance->appointmentTime)->format('l, j F на H:i'); ?>
-							</div>
-
-							<div class="center fit-content maintance-status-address">
-								<?= $maintance->office->address; ?>
-							</div>
-
-							<div height="300px" width="100%" id="map-maintance-<?= $maintance->id; ?>" class="maintance-maps" data-latitude="<?= $maintance->office->coordinateX; ?>" data-longitude="<?= $maintance->office->coordinateY; ?>" data-title="<?= $maintance->office->address; ?>" data-id="map-maintance-<?= $maintance->id; ?>"></div>
-
-							<div class="fields">
-								<label>
-									<span>Автомобиль</span>
-									<a href="#car-<?= $car->id; ?>" data-car-id="<?= $car->id; ?>" class="entry-page__inner">
-										<div class="entry-page__block">
-											<span class="entry-page__block-marka">
-												<?= $car->carSerial->carModel->brand->name; ?> /
-												<?= $car->carSerial->carModel->name; ?> /
-												<?= $car->carSerial->name; ?>
-											</span>
-											<span class="entry-page__block-to">Гос номер: <?= $car->govNumber; ?></span>
-										</div>
-									</a>
-								</label>
-
-								<? if ($maintance->services) : ?>
-									<label>
-										<span>Услуги</span>
-										<? foreach ($maintance->services as $service) : ?>
-											<div><?= $service->name; ?></div>
-										<? endforeach; ?>
-									</label>
-								<? endif; ?>
-
-
-								<? if ($maintance->userDescription) : ?>
-									<label>
-										<span>Комментарий</span>
-										<div><?= $maintance->userDescription; ?></div>
-									</label>
-								<? endif; ?>
-							</div>
-
-							<!-- <button class="sms__btn button mb-2">Перенести</button> -->
-
-							<!-- <div class="button-inverted center fit-content" data-maintance-cancel="<?= $maintance->id; ?>">Отменить</div> -->
-						</form>
+						<?= render('maintance_form.php', ['maintance' => $maintance]) ?>
 					</div>
 				<?php endforeach; ?>
 
@@ -129,7 +64,7 @@ Carbon::setLocale('ru');
 				<button href="#form-add-maintance-car" data-fancybox class="entry__btn entry-page__btn">Записаться на СТО</button>
 			</div>
 
-			<div class="personal-tabs__content">
+			<div class="personal-tabs__content <?= $currentScreen == 'garage' ? 'show' : 'hide'; ?>">
 				<?php foreach ($cars as $key => $car) : ?>
 					<a href="#car-<?= $car->id; ?>" data-fancybox class="entry-page__inner">
 						<div class="entry-page__block">
@@ -183,13 +118,17 @@ Carbon::setLocale('ru');
 									</a>
 								<?php endforeach; ?>
 							</div>
+
+							<a href="#form-add-maintance-services" data-add-maintance-car data-fancybox data-car-id="<?= $car->id; ?>" class="expect__btn button">
+								Записаться на СТО
+							</a>
 						</form>
 					</div>
 				<?php endforeach; ?>
 				<button data-fancybox href="#form-add-car" class="entry__btn entry-page__btn">Добавить машину</button>
 			</div>
 
-			<div class="personal-tabs__content">
+			<div class="personal-tabs__content <?= $currentScreen == 'settings' ? 'show' : 'hide'; ?>">
 				<button data-fancybox href="#form-sms-info" class="entry__btn entry-page__btn">Обновить данные профиля</button>
 			</div>
 		</div>

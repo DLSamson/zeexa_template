@@ -6,6 +6,9 @@ if (!defined('CURRENT_URI'))
 	define('CURRENT_URI', $APPLICATION->GetCurUri());
 
 use App\Services\ApiService;
+$api = getApi();
+$user = $api->getUser();
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -85,8 +88,9 @@ use App\Services\ApiService;
 
 			<? $APPLICATION->IncludeFile(SITE_TEMPLATE_PATH . '/including_areas/header/header_main-phone.php'); ?>
 
-			<?php /*<img class="user-icon" src="<?= SITE_TEMPLATE_PATH ?>/img/icon/user.svg" width="24" height="24" alt=""
-												loading="lazy">*/?>
+			<a href="<?= $user ? '/login' : '#form-sms' ?>" <?= !$user ? 'data-fancybox' : '' ?> class="header_auth-icon">
+				<img class="user-icon" src="<?= SITE_TEMPLATE_PATH ?>/img/icon/user.svg" width="24" height="24" alt="" loading="lazy">
+			</a>
 
 			<button class="cmn-toggle-switch cmn-toggle-switch__htx" id="menu__button">
 				<span>toggle menu</span>
@@ -116,7 +120,7 @@ use App\Services\ApiService;
 			
 			<? if($user): ?>
 				<a class="header__user" href="/login">
-					<div class="header__user-avatar"><?= substr($user->name, 0, 1); ?></div>
+					<div class="header__user-avatar"><?= mb_substr($user->name, 0, 1); ?></div>
 					<div class="header__user-name"><?= $user->name ?></div>
 					<div class="header__user-arrow">
 						<img src="<?= SITE_TEMPLATE_PATH ?>/img/icon/arrows-select.svg" alt="">
@@ -207,28 +211,7 @@ use App\Services\ApiService;
 			false
 		); ?>
 
-		<div class="header-block">
-			<form class="header-form" data-ajaxform data-command="form.lead">
-				<?php
-				/* <select name="" id="" class="header-form__select">
-																										<option value="" class="header-form__option">Выберите адрес</option>
-																										<option value="" class="header-form__option">ул. Авто, д. 100</option>
-																										<option value="" class="header-form__option">ул. Авто, д. 100</option>
-																									</select> */
-				?>
-
-				<div class="header-form__inputs">
-					<input type="text" name="name" class="header-form__input" placeholder="Ваше имя">
-					<input type="text" name="car-model" class="header-form__input" placeholder="Марка автомобиля">
-					<input type="text" name="date" class="header-form__input" placeholder="Желаемая дата и время">
-				</div>
-				<input type="text" name="phone" class="inputmask header-form__input"
-					placeholder="Укажите номер телефона">
-
-				<button class="header-form__btn">Записаться</button>
-			</form>
-			<button class="btn btn--long btn--long-mobile">Записаться</button>
-		</div>
+		<?= render('header_form.php') ?>
 
 		<a href="#form-lead" data-fancybox="" class="header-button">Записаться</a>
 

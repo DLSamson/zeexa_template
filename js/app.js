@@ -486,8 +486,7 @@ const initServices = () => {
                         .addClass('services-modal')
                         .text('Вы успешно записались');
 
-                    $.fancybox.open(modal);
-                    setTimeout(() => window.location.href="/login", 3000);
+                    $.fancybox.open($(response.form));
                 },
                 error() {
                     const modal = $('<div>')
@@ -642,6 +641,7 @@ const getPath = (path) => {
 
 
 let user = null;
+let phone = null;
 const services = {
     auth: {
         tokenName: 'auth_token',
@@ -709,24 +709,29 @@ const services = {
             },
             counter: 0,
             codeStartCounter(modal, 
-                onCounterEnd = () => { setTimeout(this.codeStartCounter, 1000) }
+                onCounterEnd = () => {
+                    setTimeout(() => {
+                        services.auth.sendCode(phone);
+                        this.codeStartCounter()
+                }, 1000) }
             ) {
                 const text = $('[data-counter-text]', modal);
-                const counter = $('[data-counter]', modal);
                 const twoMinutes = 2 * 60 * 1000;
                 const timeEnd = Date.now() + twoMinutes;
-                log('Start counter', { text, counter, timeEnd });
+                if (this.counter > 0) return;
+                
+                log('Start counter', { text, timeEnd });
 
                 text.html('Отправить код повторно <span data-counter>через 1:59</span>');
 
                 const interval = setInterval(() => {
                     const timeLeft = timeEnd - Date.now();
+                    const timeCounter = $('[data-counter]', text);
                     this.counter = timeLeft;
                     const timeLeftIso = new Date(timeLeft).toISOString().slice(14, 19);
-                    // log('counter', { timeLeftIso, counter });
-                    
 
-                    counter.html(`через ${timeLeftIso}`);
+                    log('counter', { timeLeftIso, timeCounter });
+                    timeCounter.text(`через ${timeLeftIso}`);
 
                     if (timeLeft > 0) {
                         return;
@@ -734,7 +739,12 @@ const services = {
 
                     clearInterval(interval);
                     text.html('Получить код еще раз');
-                    onCounterEnd(text, counter);
+
+                    text.on('click', () => {
+                        if (this.counter > 0) return;
+
+                        onCounterEnd();
+                    });
                     return;
                 }, 1000);
             }
@@ -769,6 +779,7 @@ const initAuth = () => {
         log('Phone keyup', { event, inputs });
         const input = $(event.delegateTarget);
         inputs.phone = input.val();
+        phone = input.val();
     }
 
     const onPhoneFormSubmit = async (event) => {
@@ -785,19 +796,44 @@ const initAuth = () => {
         }
     }
 
+    let currentCodeInputCount = 0;
     const onCodeInputKeyUp = (event) => {
         event.preventDefault();
+
         const codeInputs = codeForm.find('[name=code]');
         codeInputs.removeClass('error');
+
+        log('Code keyup', { event, codeInputs, currentCodeInputCount });
+        if(event.originalEvent.key == 'Backspace') {
+            if(currentCodeInputCount != 0) {
+                currentCodeInputCount--;
+            }
+        }
+        else {
+            if(currentCodeInputCount != 3) {
+                currentCodeInputCount++;
+            }
+        }
+
+        const currentCodeInput = codeInputs
+            .filter((i, element) =>
+                $(element).data('code') == currentCodeInputCount || $(element).val() == '')
+            .first();
         
-        inputs.code = codeInputs.map((i, input) => $(input).val()).toArray().join('');
-        log('Code keyup', { event, inputs });
+        currentCodeInput.focus();
+        log('Code keyup', { event, inputs, currentCodeInput});
     }
 
     const onCodeFormSubmit = async (event) => {
         log('onCodeFormSubmit', { event, inputs });
         event.preventDefault();
         codeForm.find('[name=code]').removeClass('error');
+
+        const codeInputs = codeForm.find('[name=code]');
+        inputs.code = codeInputs
+            .map((i, input) => $(input).val())
+            .toArray()
+            .join('');
 
         try {
             const token = await services.auth.getToken(inputs.phone, inputs.code);
@@ -874,10 +910,10 @@ const initAuth = () => {
     log('END');
 }
 
-const initAxios = () => {
+const initAxios = async () => {
     axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     axios.defaults.headers.common['Content-Type'] = 'application/json';
-    services.auth.getUser();
+    user = await services.auth.getUser();
 }
 
 const initSelect = () => {
@@ -889,26 +925,25 @@ const initSelect = () => {
         const current = $('[data-dropdown-current]', dropdown);
         const search = $('[data-dropdown-search]', dropdown);
         const list = $('[data-dropdown-list]', dropdown);
+        log('dropdown', { dropdown, current, search, list });
 
-        const onOuterClick = (event) => {
-            //bug
-            log('onOuterClick', { event, dropdown });
-            if (event.target.contains(dropdown[0])) return;
+        // const onOuterClick = (event) => {
+        //     //bug
+        //     log('onOuterClick', { event, dropdown });
+        //     if (event.target.contains(dropdown[0])) return;
 
-            list.hide();
-            search.hide();
-        }
+        //     list.hide();
+        //     search.hide();
+        // }
 
         const onSearchKeyup = (event) => {
-            const listItems = $(list).child();
+            const listItems = $(list).children();
             const searchValue = search.val().toLowerCase();
             log('onSearchKeyup', { event, list, listItems, searchValue });
             listItems.show();
 
-            if (searchValue.length <= 3) return;
-
             listItems.filter((i, item) =>
-                !item.text().toLowerCase().includes(searchValue)).hide();
+                !$(item).text().toLowerCase().includes(searchValue)).hide();
         }
 
         const onDropDownClick = (event) => {
@@ -927,9 +962,9 @@ const initSelect = () => {
             search.hide();
         }
 
-        list.on('click', 'li', onListItemClick);
         dropdown.on('click', onDropDownClick);
-        search.on('kedown', onSearchKeyup);
+        list.on('click', 'li', onListItemClick);
+        search.on('keyup', onSearchKeyup);
         // $(window).on('click', onOuterClick);
     });
 }
@@ -968,7 +1003,12 @@ const initAddCarForm = () => {
                         .addClass('ajax-form')
                         .text('Ваша машина успешно добавлена');
                 $.fancybox.open(form);
-                setTimeout(() => window.location.reload(), 3000);
+                setTimeout(() => {
+                    const url = new URL(window.location);
+                    url.searchParams.append('screen', 'garage');
+
+                    window.location = url;
+                }, 3000);
             }
         })
     }
@@ -1148,11 +1188,17 @@ const initAddMaintanceForm = () => {
             method: 'POST',
             success(response) {
                 log('Response', response);
-                window.location.reload();
+                const formSuccess = response.form;
+                $.fancybox.close();
+                $.fancybox.open($(formSuccess));
             }
         })
 
         log('onSubmit', { formInputs, inputs });
+    });
+
+    $('[data-add-maintance-car]').on('click', ({delegateTarget}) => {
+        inputs.carId = $(delegateTarget).data('car-id');
     });
 
     log('END', { carItems, formCar, formServices, formOffices, inputs, searchInput, serviceGroups });
@@ -1210,12 +1256,27 @@ const initMaintanceMapForElement = (element) => {
     ymaps.ready(() => init(data));
 }
 
-
-
 const initMaintanceMapElements = () => {
     const maps = $('.maintance-maps');
     log('initMaintanceMapElements', { maps });
     maps.each((i, element) => initMaintanceMapForElement($(element)));
+}
+
+const initHeaderForm = () => {
+    const form = $('#header-form');
+
+    log('initHeaderForm', { form });
+
+    const values = $('[data-dropdown-list] > li', form);
+    values.on('click', ({ delegateTarget }) => {
+        const parent = $(delegateTarget).parents('[data-dropdown]');
+        const name = parent.find('[data-dropdown-current]').attr('data-dropdown-current');
+        const input = form
+            .find(`input[name=${name}]`)
+            .val($(delegateTarget).text());
+
+        log('dropdown change', {delegateTarget, parent, name, input});
+    });
 }
 
 initModules([
@@ -1232,6 +1293,7 @@ initModules([
     initAuth,
     initAxios,
     initSelect,
+    initHeaderForm,
     initAddCarForm,
     initAddMaintanceForm,
     initMaintanceMapElements,
